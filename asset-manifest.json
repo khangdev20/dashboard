@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/dashboard-codeflix/static/css/main.b26b5867.css",
-    "main.js": "/dashboard-codeflix/static/js/main.8cf8880d.js",
+    "main.js": "/dashboard-codeflix/static/js/main.a4695c5d.js",
     "static/js/787.545aecf5.chunk.js": "/dashboard-codeflix/static/js/787.545aecf5.chunk.js",
     "index.html": "/dashboard-codeflix/index.html",
     "main.b26b5867.css.map": "/dashboard-codeflix/static/css/main.b26b5867.css.map",
-    "main.8cf8880d.js.map": "/dashboard-codeflix/static/js/main.8cf8880d.js.map",
+    "main.a4695c5d.js.map": "/dashboard-codeflix/static/js/main.a4695c5d.js.map",
     "787.545aecf5.chunk.js.map": "/dashboard-codeflix/static/js/787.545aecf5.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b26b5867.css",
-    "static/js/main.8cf8880d.js"
+    "static/js/main.a4695c5d.js"
   ]
 }
