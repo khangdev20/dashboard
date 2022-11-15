@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/dashboard-codeflix/login/static/css/main.b26b5867.css",
-    "main.js": "/dashboard-codeflix/login/static/js/main.099d9678.js",
-    "static/js/787.545aecf5.chunk.js": "/dashboard-codeflix/login/static/js/787.545aecf5.chunk.js",
-    "index.html": "/dashboard-codeflix/login/index.html",
-    "main.b26b5867.css.map": "/dashboard-codeflix/login/static/css/main.b26b5867.css.map",
-    "main.099d9678.js.map": "/dashboard-codeflix/login/static/js/main.099d9678.js.map",
-    "787.545aecf5.chunk.js.map": "/dashboard-codeflix/login/static/js/787.545aecf5.chunk.js.map"
+    "main.css": "/static/css/main.b26b5867.css",
+    "main.js": "/static/js/main.cbb760dd.js",
+    "static/js/787.545aecf5.chunk.js": "/static/js/787.545aecf5.chunk.js",
+    "index.html": "/index.html",
+    "main.b26b5867.css.map": "/static/css/main.b26b5867.css.map",
+    "main.cbb760dd.js.map": "/static/js/main.cbb760dd.js.map",
+    "787.545aecf5.chunk.js.map": "/static/js/787.545aecf5.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b26b5867.css",
-    "static/js/main.099d9678.js"
+    "static/js/main.cbb760dd.js"
   ]
 }
