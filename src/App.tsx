@@ -1,25 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { Fragment } from "react";
+import Login from "./pages/auth/Login/Login";
+import "./App.css";
+import { publicRoutes } from "./routes/index";
+import DefaultLayout from "./components/Layout/DefaultLayout/DefaultLayout";
+import { SnackbarProvider } from "notistack";
+import { Box } from "@mui/material";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <SnackbarProvider autoHideDuration={2000} maxSnack={6}>
+      <Box>
+        {sessionStorage.getItem("jwt") !== null ? (
+          <Routes>
+            {publicRoutes.map((route, key) => {
+              const Layout = route.layout === null ? Fragment : DefaultLayout;
+              const Page = route.component;
+              return (
+                <Route
+                  key={key}
+                  path={route.path}
+                  element={
+                    <Layout>
+                      <Page />
+                    </Layout>
+                  }
+                />
+              );
+            })}
+          </Routes>
+        ) : (
+          <Login />
+        )}
+      </Box>
+    </SnackbarProvider>
   );
 }
 
