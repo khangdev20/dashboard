@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/dashboard-codeflix/static/css/main.b26b5867.css",
-    "main.js": "/dashboard-codeflix/static/js/main.8cf8880d.js",
-    "static/js/787.545aecf5.chunk.js": "/dashboard-codeflix/static/js/787.545aecf5.chunk.js",
-    "index.html": "/dashboard-codeflix/index.html",
-    "main.b26b5867.css.map": "/dashboard-codeflix/static/css/main.b26b5867.css.map",
-    "main.8cf8880d.js.map": "/dashboard-codeflix/static/js/main.8cf8880d.js.map",
-    "787.545aecf5.chunk.js.map": "/dashboard-codeflix/static/js/787.545aecf5.chunk.js.map"
+    "main.css": "/dashboard-codeflix/login/static/css/main.b26b5867.css",
+    "main.js": "/dashboard-codeflix/login/static/js/main.099d9678.js",
+    "static/js/787.545aecf5.chunk.js": "/dashboard-codeflix/login/static/js/787.545aecf5.chunk.js",
+    "index.html": "/dashboard-codeflix/login/index.html",
+    "main.b26b5867.css.map": "/dashboard-codeflix/login/static/css/main.b26b5867.css.map",
+    "main.099d9678.js.map": "/dashboard-codeflix/login/static/js/main.099d9678.js.map",
+    "787.545aecf5.chunk.js.map": "/dashboard-codeflix/login/static/js/787.545aecf5.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b26b5867.css",
-    "static/js/main.8cf8880d.js"
+    "static/js/main.099d9678.js"
   ]
 }
