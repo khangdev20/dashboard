@@ -2,6 +2,7 @@
   "name": "dashboard",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://dashboard-codeflix.github.io/dashboard/",
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
@@ -21,6 +22,7 @@
     "chart.js": "^3.9.1",
     "cors": "^2.8.5",
     "firebase": "^9.13.0",
+    "gh-pages": "^4.0.0",
     "notistack": "^2.0.8",
     "react": "^18.2.0",
     "react-chartjs-2": "^4.3.1",
@@ -37,7 +39,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
