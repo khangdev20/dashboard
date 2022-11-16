@@ -1,5 +1,4 @@
 import { Button } from "@mui/material";
-import React from "react";
 
 export default function CustomButton({ onClick, color, text, type }: any) {
   return (

@@ -14,7 +14,6 @@ import InfoIcon from "@mui/icons-material/Info";
 
 export const CustomCard = ({
   name,
-  img,
   hideAvatar,
   email,
   phone,
@@ -73,7 +72,7 @@ export const CustomCard = ({
                 }}
                 alt={"avata" + name}
                 src={
-                  avatar != null
+                  avatar != ""
                     ? avatar
                     : "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/default-avatar-1.png"
                 }

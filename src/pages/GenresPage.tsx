@@ -11,6 +11,7 @@ import { useSnackbar } from "notistack";
 import { CustomCard } from "../components/Card/CustomCard";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
 import "./index.css";
+import { SubHeader } from "../components/Header/SubHeader";
 
 export default function GenresPage() {
   const { enqueueSnackbar } = useSnackbar();
@@ -82,7 +83,7 @@ export default function GenresPage() {
   return (
     <Box>
       {loading ? <LinearProgress color="secondary" /> : ""}
-      <CustomSpeedDial onClick={handleOpenModal} right={20} />
+      <SubHeader addButton={handleOpenModal} />
       <Box className="flex-wrap">
         {data.map((value, key) => (
           <CustomCard

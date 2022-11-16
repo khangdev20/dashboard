@@ -11,6 +11,7 @@ import { REQUEST_TYPE } from "../Enums/RequestType";
 import { useSnackbar } from "notistack";
 import { PackageEntity } from "../models/PackageEntity";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
+import { SubHeader } from "../components/Header/SubHeader";
 
 const PackagePage = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -73,11 +74,7 @@ const PackagePage = () => {
 
   return (
     <Box>
-      <CustomSpeedDial
-        right={20}
-        direction="down"
-        onClick={() => setOpenModal(true)}
-      />
+      <SubHeader addButton={() => setOpenModal(true)} />
       {renderPackages}
       <ConfirmDialog
         open={openConfirm}

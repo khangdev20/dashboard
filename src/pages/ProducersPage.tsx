@@ -11,6 +11,7 @@ import { REQUEST_TYPE } from "../Enums/RequestType";
 import { ProducerEntity } from "../models/ProducerEntity";
 import { CustomCard } from "../components/Card/CustomCard";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
+import { SubHeader } from "../components/Header/SubHeader";
 
 export default function ProducersPage() {
   const { enqueueSnackbar } = useSnackbar();
@@ -72,7 +73,7 @@ export default function ProducersPage() {
 
   return (
     <Box>
-      <CustomSpeedDial onClick={handleOpenModal} right={20} />
+      <SubHeader addButton={handleOpenModal} />
       <div className="flex-wrap">
         {data.map((value, key) => (
           <CustomCard

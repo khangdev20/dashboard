@@ -5,6 +5,7 @@ import {
   TextField,
   MenuItem,
   LinearProgress,
+  Toolbar,
 } from "@mui/material";
 import "./index.css";
 import React, { useCallback, useEffect, useState, useRef } from "react";
@@ -18,6 +19,7 @@ import { REQUEST_TYPE } from "../Enums/RequestType";
 import { UserEntity } from "../models/UserEntity";
 import { CustomCard } from "../components/Card/CustomCard";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
+import { SubHeader } from "../components/Header/SubHeader";
 
 export default function UsersPage() {
   const { enqueueSnackbar } = useSnackbar();
@@ -30,6 +32,8 @@ export default function UsersPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState(null);
+  console.log(avatar);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [users, setUsers] = useState<UserEntity[]>([]);
   const { callApi } = useApi();
@@ -59,6 +63,13 @@ export default function UsersPage() {
 
   const onChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(e.target.value);
+  };
+
+  const selectAvatar = (e: any) => {
+    let selected = e.target.files[0];
+    if (!selected) return;
+    setAvatar(selected);
+    console.log(selected);
   };
 
   const roles = [
@@ -150,7 +161,7 @@ export default function UsersPage() {
   return (
     <div>
       {loading ? <LinearProgress color="secondary" /> : ""}
-      <CustomSpeedDial onClick={handleOpenModal} right={20} />
+      <SubHeader addButton={handleOpenModal} refreshButton={() => getUsers()} />
       <div className="flex-wrap">
         {users.map((value) => (
           <CustomCard
@@ -159,6 +170,7 @@ export default function UsersPage() {
             name={value.name}
             email={value.email}
             role={value.role}
+            avatar={value.avatar}
             handleDelete={() => {
               setOpenDialog(true);
               idUser.current = value.id;
@@ -181,38 +193,42 @@ export default function UsersPage() {
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={modalTheme}>
           <Typography>ADD USER</Typography>
-          <CustomInput
-            placeholder="Name"
-            label="Name"
-            value={name}
-            onChange={onChangeName}
-          />
-          <CustomInput
-            placeholder="Email"
-            label="Email"
-            value={email}
-            onChange={onChangeEmail}
-          />
+          <Box className="dp-flex">
+            <CustomInput
+              placeholder="Name"
+              label="Name"
+              value={name}
+              onChange={onChangeName}
+            />
+            <CustomInput
+              placeholder="Email"
+              label="Email"
+              value={email}
+              onChange={onChangeEmail}
+            />
+          </Box>
           <CustomInput
             placeholder="Phone"
             label="Phone"
             value={phone}
             onChange={onChangePhone}
           />
-          <CustomInput
-            placeholder="Password"
-            label="Password"
-            value={password}
-            onChange={onChangePassword}
-            icon={true}
-          />
-          <CustomInput
-            placeholder="Password"
-            label="Password"
-            value={confirmPassword}
-            onChange={onChangeConfirmPassword}
-            icon={true}
-          />
+          <Box className="dp-flex">
+            <CustomInput
+              placeholder="Password"
+              label="Password"
+              value={password}
+              onChange={onChangePassword}
+              icon={true}
+            />
+            <CustomInput
+              placeholder="Password"
+              label="Password"
+              value={confirmPassword}
+              onChange={onChangeConfirmPassword}
+              icon={true}
+            />
+          </Box>
           <TextField
             margin="normal"
             select
@@ -244,38 +260,42 @@ export default function UsersPage() {
       <Modal open={openFormEdit} onClose={handleCloseModal}>
         <Box sx={modalTheme}>
           <Typography>EDIT USER</Typography>
-          <CustomInput
-            placeholder="Name"
-            label="Name"
-            value={name}
-            onChange={onChangeName}
-          />
-          <CustomInput
-            placeholder="Email"
-            label="Email"
-            value={email}
-            onChange={onChangeEmail}
-          />
+          <Box className="dp-flex">
+            <CustomInput
+              placeholder="Name"
+              label="Name"
+              value={name}
+              onChange={onChangeName}
+            />
+            <CustomInput
+              placeholder="Email"
+              label="Email"
+              value={email}
+              onChange={onChangeEmail}
+            />
+          </Box>
           <CustomInput
             placeholder="Phone"
             label="Phone"
             value={phone}
             onChange={onChangePhone}
           />
-          <CustomInput
-            placeholder="Password"
-            label="Password"
-            value={password}
-            onChange={onChangePassword}
-            icon={true}
-          />
-          <CustomInput
-            placeholder="Password"
-            label="Password"
-            value={confirmPassword}
-            onChange={onChangeConfirmPassword}
-            icon={true}
-          />
+          <Box className="dp-flex">
+            <CustomInput
+              placeholder="Password Old"
+              label="Password Old"
+              value={password}
+              onChange={onChangePassword}
+              icon={true}
+            />
+            <CustomInput
+              placeholder="Password New"
+              label="Password New"
+              value={confirmPassword}
+              onChange={onChangeConfirmPassword}
+              icon={true}
+            />
+          </Box>
           <TextField
             select
             fullWidth
@@ -290,6 +310,22 @@ export default function UsersPage() {
               </MenuItem>
             ))}
           </TextField>
+          {avatar == null ? null : (
+            <img
+              height={100}
+              width={100}
+              style={{
+                borderRadius: 100,
+              }}
+              src={URL.createObjectURL(avatar)}
+            />
+          )}
+          <input
+            type={"file"}
+            accept="image/*"
+            title="avatar"
+            onChange={selectAvatar}
+          />
           <Box
             sx={{
               display: "flex",

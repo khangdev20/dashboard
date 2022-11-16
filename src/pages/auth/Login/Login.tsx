@@ -42,13 +42,12 @@ export default function Login() {
         ip: ip,
         country: countryName,
       })
-      .then(async (res) => {
+      .then((res) => {
         setLoading(false);
-        const response = res.data;
-        console.log(response);
-        sessionStorage.setItem("jwt", response);
+        sessionStorage.setItem("jwt", res.data);
         enqueueSnackbar("Login Success!", { variant: "success" });
         navigate("/dashboard");
+        window.location.reload();
       })
       .catch((err) => {
         setLoading(false);

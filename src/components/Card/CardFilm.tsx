@@ -18,6 +18,7 @@ export const CardFilm = ({
   handleDelete,
   handleDetail,
   handleEdit,
+  posterTitle,
 }: any) => {
   return (
     <div>
@@ -34,7 +35,12 @@ export const CardFilm = ({
         }}
         onClick={onClick}
       >
-        <img height="335px" width="215px" src={src} />
+        <img
+          height="335px"
+          width="215px"
+          src={src}
+          title={"Poster " + posterTitle}
+        />
         <Divider />
         <div>
           <CardActions

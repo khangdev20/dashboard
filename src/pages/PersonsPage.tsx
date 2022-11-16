@@ -11,6 +11,7 @@ import { REQUEST_TYPE } from "../Enums/RequestType";
 import { PersonEntity } from "../models/PersonEntity";
 import { CustomCard } from "../components/Card/CustomCard";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
+import { SubHeader } from "../components/Header/SubHeader";
 
 export default function PersonsPage() {
   const { enqueueSnackbar } = useSnackbar();
@@ -80,7 +81,7 @@ export default function PersonsPage() {
   }, [getPersons]);
   return (
     <Box>
-      <CustomSpeedDial onClick={handleOpenModal} right={20} />
+      <SubHeader addButton={handleOpenModal} />
       <div className="flex-wrap">
         {data.map((value, key) => (
           <CustomCard

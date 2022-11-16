@@ -1,4 +1,4 @@
-export const baseUrl = "https://5709-14-241-241-89.ap.ngrok.io";
+export const baseUrl = "https://localhost:7043";
 export const styles = {
   position: "absolute" as "absolute",
   top: "50%",

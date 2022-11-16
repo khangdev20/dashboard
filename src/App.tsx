@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Fragment } from "react";
 import Login from "./pages/auth/Login/Login";
 import "./App.css";

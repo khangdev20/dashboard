@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   IconButton,
   LinearProgress,
   Modal,
@@ -25,7 +26,6 @@ import { FilmEntity } from "../models/FilmEnity";
 import { CustomCard } from "../components/Card/CustomCard";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
 import { CustomMenu } from "../components/Menu/CustomMenu";
-import SearchIcon from "@mui/icons-material/Search";
 import { storage } from "../firebase/firebase";
 import { ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
@@ -34,6 +34,7 @@ import { GenreFilmEntity } from "../models/GenreFilmEntity";
 import { getDownloadURL, deleteObject } from "firebase/storage";
 import { async } from "@firebase/util";
 import { CardFilm } from "../components/Card/CardFilm";
+import { SubHeader } from "../components/Header/SubHeader";
 
 export default function FilmsPage() {
   const [openModal, setOpenModal] = useState(false);
@@ -44,6 +45,7 @@ export default function FilmsPage() {
   const [anchorElSearch, setAnchorElSearch] = useState<null | HTMLElement>(
     null
   );
+  const [replaceVideoPoster, setReplaceVideoPoster] = useState(false);
   const [loadingUpload, setLoadingUpload] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [genres, setGenres] = useState<GenreEntity[]>([]);
@@ -165,13 +167,7 @@ export default function FilmsPage() {
   const handleCloseModalDetail = () => {
     setFilm(undefined);
     setOpenModalDetail(false);
-  };
-
-  const handleOpenSearch = (event: any) => {
-    setAnchorElSearch(event.currentTarget);
-  };
-  const handleCloseSearch = () => {
-    setAnchorElSearch(null);
+    setReplaceVideoPoster(false);
   };
 
   const { callApi } = useApi();
@@ -193,6 +189,7 @@ export default function FilmsPage() {
   };
   const onChangeKeyName = (e: any) => {
     setKeyName(e.target.value);
+    console.log(keyName);
   };
 
   const listAge = [
@@ -363,6 +360,7 @@ export default function FilmsPage() {
         <CardFilm
           key={key}
           src={value.mobileUrl}
+          posterTitle={value.name}
           handleDelete={() => {
             idFim.current = value.id;
             setOpenDialog(true);
@@ -382,12 +380,9 @@ export default function FilmsPage() {
   const RenderSearchFilmsResult = (
     <>
       {resultSearchFilms.map((value, key) => (
-        <CustomCard
+        <CardFilm
           key={key}
-          name={value.name}
-          email={value.age}
-          created={value.created}
-          views={value.views}
+          src={value.mobileUrl}
           handleDelete={() => {
             idFim.current = value.id;
             setOpenDialog(true);
@@ -407,24 +402,50 @@ export default function FilmsPage() {
   const renderDetail = (
     <Modal open={openModalDetail} onClose={handleCloseModalDetail}>
       <Box sx={modalTheme}>
-        <Box
-          sx={{
-            ":hover": {
-              cursor: "pointer",
-            },
-          }}
-        >
-          <img
-            style={{
-              maxHeight: 300,
+        {replaceVideoPoster ? (
+          <Box
+            sx={{
+              ":hover": {
+                cursor: "pointer",
+              },
             }}
-            src={film?.webUrl}
-            alt={`poster ${film?.name}`}
-            title={film?.name}
-          />
-          <iframe src={film?.videoUrl} />
-        </Box>
-        <Typography>Name: {film?.name}</Typography>
+          >
+            <iframe
+              height={300}
+              width={550}
+              src={film?.videoUrl}
+              allowTransparency
+            />
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              ":hover": {
+                cursor: "pointer",
+              },
+            }}
+          >
+            <img
+              style={{
+                maxHeight: 300,
+              }}
+              src={film?.webUrl}
+              alt={`poster ${film?.name}`}
+              title={film?.name}
+            />
+          </Box>
+        )}
+
+        <Button
+          size="medium"
+          color="error"
+          onClick={() => setReplaceVideoPoster(!replaceVideoPoster)}
+        >
+          PLAY
+        </Button>
+        <Typography fontSize={20} fontWeight="bold" textTransform="uppercase">
+          Name: {film?.name}
+        </Typography>
         <Typography>Producer: {producerOfFilm?.name}</Typography>
         <Typography>Views: {film?.views}</Typography>
         <Box className="dp-flex">
@@ -643,41 +664,12 @@ export default function FilmsPage() {
   return (
     <Box>
       {loading ? <LinearProgress color="secondary" /> : ""}
-      <CustomSpeedDial
-        onClick={handleOpenModal}
-        right={20}
-        direction="down"
-        onClickSearch={handleOpenSearch}
+      <SubHeader
+        addButton={handleOpenModal}
+        refreshButton={() => getFilms()}
+        onChange={onChangeKeyName}
+        value={keyName}
       />
-      <CustomMenu
-        horizontal="right"
-        anchorEl={anchorElSearch}
-        onClose={handleCloseSearch}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            pl: 2,
-            alignItems: "center",
-          }}
-        >
-          <CustomInput
-            placeholder="Name"
-            onChange={onChangeKeyName}
-            value={keyName}
-          />
-          <IconButton
-            sx={{
-              width: 56,
-              height: 56,
-              margin: 1,
-            }}
-            onClick={() => getFilmsByName(keyName)}
-          >
-            <SearchIcon />
-          </IconButton>
-        </Box>
-      </CustomMenu>
       <div className="flex-wrap">
         {resultSearchFilms.length > 0 ? RenderSearchFilmsResult : RenderFilms}
       </div>
