@@ -21,45 +21,47 @@ import { REQUEST_TYPE } from "../../Enums/RequestType";
 import { useNavigate } from "react-router-dom";
 import { ConfirmDialog } from "../Dialog/ConfirmDialog";
 import { CustomMenu } from "../Menu/CustomMenu";
-import SiderBar from "../Sider/SideBar";
-
+import SideBar from "../Sider/SideBar";
 export const OpenDrawer = createContext(false);
 
-export default function Header() {
+function Header() {
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElNoti, setAnchorElNoti] = useState<null | HTMLElement>(null);
   const { callApi } = useApi();
   const [data, setData] = useState<UserEntity>();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const [onConfirmLogout, setOnConfirmLogout] = useState(false);
-
   const handleOnConfirmLogout = () => setOnConfirmLogout(true);
-
   const handleLogout = () => {
     sessionStorage.removeItem("jwt");
     navigate("/login");
+    window.location.reload();
   };
-  useEffect(() => {
-    const getNewToken = setInterval(() => {
-      callApi<string>(REQUEST_TYPE.GET, "api/users/getNewToken")
-        .then((res) => {
-          const response = res.data;
-          console.log(response);
-          sessionStorage.setItem("jwt", response);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }, 1200000);
-    return () => clearInterval(getNewToken);
-  }, []);
+  // useEffect(() => {
+  //   setInterval(async () => {
+  //     await callApi<string>(REQUEST_TYPE.GET, "api/users/getNewToken")
+  //       .then((res) => {
+  //         const response = res.data;
+  //         console.log(response);
+  //         sessionStorage.setItem("jwt", response);
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //       });
+  //   }, 27000000);
+  // });
 
   const getProfile = useCallback(() => {
     callApi<UserEntity>(REQUEST_TYPE.GET, "api/users/profile")
       .then((res) => {
-        if (res) setData(res.data);
+        if (res.data.role === "User") {
+          console.log(res.data.role);
+          navigate("/notfound");
+          window.close();
+        } else {
+          setData(res.data);
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -133,7 +135,11 @@ export default function Header() {
               <IconButton onClick={handleOpenUserMenu}>
                 <Avatar
                   alt="Remy Sharp"
-                  src="https://cdnnews.mogi.vn/news/wp-content/uploads/2022/04/meo-vao-nha-la-diem-gi-1.jpg"
+                  src={
+                    data?.avatar != ""
+                      ? data?.avatar
+                      : "https://haycafe.vn/wp-content/uploads/2021/11/Anh-avatar-dep-chat-lam-hinh-dai-dien.jpg"
+                  }
                 />
               </IconButton>
             </Tooltip>
@@ -198,8 +204,10 @@ export default function Header() {
             </CustomMenu>
           </Toolbar>
         </AppBar>
-        <SiderBar handleCloseDrawer={() => setMobileOpen(!mobileOpen)} />
+        <SideBar handleCloseDrawer={() => setMobileOpen(!mobileOpen)} />
       </Box>
     </OpenDrawer.Provider>
   );
 }
+
+export default Header;

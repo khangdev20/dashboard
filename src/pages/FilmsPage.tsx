@@ -1,13 +1,21 @@
+//#region IMPORT
 import {
   Box,
   Button,
+  CircularProgress,
+  FormLabel,
   IconButton,
   LinearProgress,
   Modal,
+  RadioGroup,
   TextField,
   Typography,
 } from "@mui/material";
 import "./index.css";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import Checkbox from "@mui/material/Checkbox";
 import AddIcon from "@mui/icons-material/Add";
 import { useCallback, useEffect, useState, useRef } from "react";
 import CustomButton from "../components/Button/CustomButton";
@@ -27,24 +35,26 @@ import { CustomCard } from "../components/Card/CustomCard";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
 import { CustomMenu } from "../components/Menu/CustomMenu";
 import { storage } from "../firebase/firebase";
-import { ref, uploadBytes } from "firebase/storage";
+import { connectStorageEmulator, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { PersonFilmEntity } from "../models/PersonFilmEntity";
 import { GenreFilmEntity } from "../models/GenreFilmEntity";
 import { getDownloadURL, deleteObject } from "firebase/storage";
-import { async } from "@firebase/util";
 import { CardFilm } from "../components/Card/CardFilm";
 import { SubHeader } from "../components/Header/SubHeader";
+import { Route, useNavigate } from "react-router-dom";
+import { deleteObjectFirebase } from "../firebase/deleteObject";
+import { info } from "console";
+//#endregion
 
 export default function FilmsPage() {
+  //#region State
+  const [premium, setPremium] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [resultSearchFilms, setSetResultFilms] = useState<FilmEntity[]>([]);
   const [openModalDetail, setOpenModalDetail] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [anchorElSearch, setAnchorElSearch] = useState<null | HTMLElement>(
-    null
-  );
   const [replaceVideoPoster, setReplaceVideoPoster] = useState(false);
   const [loadingUpload, setLoadingUpload] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
@@ -54,12 +64,8 @@ export default function FilmsPage() {
   const [films, setFilms] = useState<FilmEntity[]>([]);
   const [film, setFilm] = useState<FilmEntity>();
   const [loading, setLoading] = useState(false);
-  const [personOfFilm, setPersonOfFilm] = useState<PersonFilmEntity[]>([]);
-  const [genreOfFilm, setGenreOfFilm] = useState<GenreFilmEntity[]>([]);
-  const [producerOfFilm, setproducerOfFilm] = useState<ProducerEntity>();
   const [personSelects, setPersonSelects] = useState<GridRowId[]>([]);
   const [genreSelects, setGenreSelects] = useState<GridRowId[]>([]);
-  const [openPreview, setOpenPreview] = useState(false);
   const [name, setName] = useState("");
   const [describe, setDesribe] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -69,9 +75,10 @@ export default function FilmsPage() {
   const [length, setLength] = useState(0);
   const [producer, setProducer] = useState("");
   const [keyName, setKeyName] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  //#endregion
 
-  const idFim = useRef("");
-
+  //#region Select Media
   const selectVideo = (e: any) => {
     let selected = e.target.files[0];
     if (!selected) return;
@@ -91,36 +98,14 @@ export default function FilmsPage() {
     console.log(selected);
   };
 
-  const preview = () => {
-    setLoadingUpload(true);
-  };
+  //#endregion
 
-  const previewView = (
-    <Modal open={openPreview} onClose={() => setOpenPreview(false)}>
-      <Box>
-        <iframe src={videoUrl} />
-        <img src={mobileUrl} />
-        <img src={webUrl} />
-      </Box>
-    </Modal>
-  );
-
-  const deleteObjectFirebase = (value: string) => {
-    const deleteRef = ref(storage, value);
-    deleteObject(deleteRef)
-      .then(() => {
-        enqueueSnackbar("delete sucess", { variant: "success" });
-      })
-      .catch(() => {
-        enqueueSnackbar("delete faild", { variant: "error" });
-      });
-  };
-
+  //#region UPLOAD MEDIA
   const [videoUpload, setVideoUpload] = useState(null);
   const [mobileImgUpload, setMobileImgUpload] = useState(null);
   const [webImgUpload, setWebImgUpload] = useState(null);
   const uploadFilmContent = () => {
-    setOpenPreview(true);
+    setIsUploading(true);
     setLoadingUpload(true);
     if (videoUpload == null) return;
     if (mobileImgUpload == null) return;
@@ -128,50 +113,82 @@ export default function FilmsPage() {
     const videoRef = ref(storage, `videos/${v4()}`);
     uploadBytes(videoRef, videoUpload)
       .then(() => {
+        setIsUploading(false);
         getDownloadURL(videoRef).then((url) => {
           setVideoUrl(url);
         });
+        enqueueSnackbar("Upload Video Success!", { variant: "info" });
       })
       .catch((err) => {
+        setIsUploading(false);
+        enqueueSnackbar("Upload Video Faild!", { variant: "error" });
         console.error(err);
+        return;
       });
     const mobileRef = ref(storage, `images/${v4()}`);
     uploadBytes(mobileRef, mobileImgUpload)
       .then(() => {
+        setIsUploading(false);
         getDownloadURL(mobileRef).then((url) => {
           setMobileUrl(url);
         });
+        enqueueSnackbar("Upload Thumbnail Mobile Success!", {
+          variant: "info",
+        });
       })
       .catch((err) => {
+        setIsUploading(false);
+        enqueueSnackbar("Upload Mobile Image Faild!", { variant: "error" });
         console.error(err);
+        return;
       });
     const webRef = ref(storage, `images/${v4()}`);
     uploadBytes(webRef, webImgUpload)
       .then(() => {
+        setIsUploading(false);
         getDownloadURL(webRef).then((url) => {
           setWebUrl(url);
         });
+        enqueueSnackbar("Upload Thumbnail Website Success!", {
+          variant: "info",
+        });
       })
       .catch((err) => {
+        setIsUploading(false);
+        enqueueSnackbar("Upload Website Thumbnail Faild!", {
+          variant: "error",
+        });
         console.error(err);
+        return;
       });
-    setLoadingUpload(false);
   };
+  //#endregion
 
-  const handleOpenModal = () => setOpenModal(true);
+  //#region Handle
+  const handleOpenModal = () => {
+    getGenres();
+    getPersons();
+    getProducers();
+    setOpenModal(true);
+  };
   const handleOpenFormAddPerson = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleCloseAddPeson = () => setAnchorEl(null);
-  const handleCloseModal = () => setOpenModal(false);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    clean();
+  };
   const handleCloseModalDetail = () => {
     setFilm(undefined);
     setOpenModalDetail(false);
     setReplaceVideoPoster(false);
   };
+  //#endregion
 
   const { callApi } = useApi();
 
+  //#region onChange
   const handleSelectProducer = (event: any) => {
     setProducer(event.target.value);
   };
@@ -187,11 +204,12 @@ export default function FilmsPage() {
   const onChangeDescribe = (e: any) => {
     setDesribe(e.target.value);
   };
-  const onChangeKeyName = (e: any) => {
+  const onChangeKeyName = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
     setKeyName(e.target.value);
-    console.log(keyName);
   };
-
+  //#endregion
   const listAge = [
     { name: "5+" },
     { name: "9+" },
@@ -204,6 +222,7 @@ export default function FilmsPage() {
     { name: "25+" },
   ];
 
+  //#region Call Api
   const getFilms = useCallback(() => {
     setLoading(true);
     callApi<FilmEntity[]>(REQUEST_TYPE.GET, "api/films")
@@ -215,27 +234,23 @@ export default function FilmsPage() {
         console.error(err);
       });
   }, [callApi]);
-
-  const getFilmsByName = useCallback(
-    (keyName: string) => {
-      callApi<FilmEntity[]>(
-        REQUEST_TYPE.GET,
-        `api/films/search?keyname=${keyName}`
-      )
-        .then((res) => {
-          setSetResultFilms(res.data);
-          console.log(res.data);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    },
-    [callApi]
-  );
-
   useEffect(() => {
     getFilms();
   }, [getFilms]);
+
+  const getFilmsByName = (keyName: string) => {
+    callApi<FilmEntity[]>(
+      REQUEST_TYPE.GET,
+      `api/films/search?keyname=${keyName}`
+    )
+      .then((res) => {
+        setSetResultFilms(res.data);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const createFilm = () => {
     setLoading(true);
@@ -251,9 +266,10 @@ export default function FilmsPage() {
     });
     callApi(REQUEST_TYPE.POST, "api/films/create", {
       name: name,
-      description: describe,
+      describe: describe,
       producerId: producer,
       videoUrl: videoUrl,
+      premium: premium,
       webUrl: webUrl,
       mobileUrl: mobileUrl,
       length: length,
@@ -262,6 +278,7 @@ export default function FilmsPage() {
       genres: listGenres,
     })
       .then(() => {
+        clean();
         setLoading(false);
         setOpenModal(false);
         getFilms();
@@ -269,28 +286,19 @@ export default function FilmsPage() {
       })
       .catch((err) => {
         setLoading(false);
-        enqueueSnackbar("Add Film Fail", { variant: "error" });
+        enqueueSnackbar("Add Film Faild", { variant: "error" });
         console.error(err);
       });
   };
-
-  const getFilmById = useCallback(
-    (id: string) => {
-      callApi<FilmEntity>(REQUEST_TYPE.GET, `api/films/${id}`)
-        .then((res) => {
-          setFilm(res.data);
-          setproducerOfFilm(res.data.producer);
-          setGenreOfFilm(res.data.genres);
-          setPersonOfFilm(res.data.persons);
-          getFilms();
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    },
-    [callApi]
-  );
-
+  const getFilmById = (id: string) => {
+    callApi<FilmEntity>(REQUEST_TYPE.GET, `api/films/f?id=${id}`)
+      .then((res) => {
+        setFilm(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
   const deleteFilm = (id: string) => {
     setLoading(true);
     callApi(REQUEST_TYPE.DELETE, `api/films/${id}`)
@@ -307,7 +315,7 @@ export default function FilmsPage() {
       });
   };
 
-  const getProducers = useCallback(() => {
+  const getProducers = () => {
     callApi<ProducerEntity[]>(REQUEST_TYPE.GET, "api/producers")
       .then((res) => {
         setProducers(res.data);
@@ -315,13 +323,9 @@ export default function FilmsPage() {
       .catch((err) => {
         console.error(err);
       });
-  }, [callApi]);
+  };
 
-  useEffect(() => {
-    getProducers();
-  }, [getProducers]);
-
-  const getGenres = useCallback(() => {
+  const getGenres = () => {
     callApi<GenreEntity[]>(REQUEST_TYPE.GET, "api/genres")
       .then((res) => {
         setGenres(res.data);
@@ -329,13 +333,9 @@ export default function FilmsPage() {
       .catch((err) => {
         console.error(err);
       });
-  }, [callApi]);
+  };
 
-  useEffect(() => {
-    getGenres();
-  }, [getGenres]);
-
-  const getPersons = useCallback(() => {
+  const getPersons = () => {
     callApi<PersonEntity[]>(REQUEST_TYPE.GET, "api/persons")
       .then((res) => {
         setPersons(res.data);
@@ -343,32 +343,25 @@ export default function FilmsPage() {
       .catch((err) => {
         console.error(err);
       });
-  }, [callApi]);
+  };
+  //#endregion
 
-  useEffect(() => {
-    getPersons();
-  }, [getPersons]);
-
-  const columns: GridColDef[] = [
-    { field: "name", headerName: "Name Genres", width: 120 },
-    { field: "created", headerName: "Created", width: 250 },
-  ];
-
+  //#region Render Films
   const RenderFilms = (
     <>
       {films.map((value, key) => (
         <CardFilm
           key={key}
+          premium={value.premium}
           src={value.mobileUrl}
           posterTitle={value.name}
-          handleDelete={() => {
-            idFim.current = value.id;
+          onDelete={() => {
+            getFilmById(value.id);
+            console.log(value.id);
             setOpenDialog(true);
           }}
-          handleEdit={() =>
-            enqueueSnackbar("Chưa có mần!", { variant: "error" })
-          }
-          handleDetail={() => {
+          onEdit={() => enqueueSnackbar("Chưa có mần!", { variant: "error" })}
+          onDetail={() => {
             getFilmById(value.id);
             setOpenModalDetail(true);
           }}
@@ -376,21 +369,21 @@ export default function FilmsPage() {
       ))}
     </>
   );
+  //#endregion
 
+  //#region Result Search
   const RenderSearchFilmsResult = (
     <>
       {resultSearchFilms.map((value, key) => (
         <CardFilm
           key={key}
           src={value.mobileUrl}
-          handleDelete={() => {
-            idFim.current = value.id;
+          onDelete={() => {
+            getFilmById(value.id);
             setOpenDialog(true);
           }}
-          handleEdit={() =>
-            enqueueSnackbar("Chưa có mần!", { variant: "error" })
-          }
-          handleDetail={() => {
+          onEdit={() => enqueueSnackbar("Chưa có mần!", { variant: "error" })}
+          onDetail={() => {
             getFilmById(value.id);
             setOpenModalDetail(true);
           }}
@@ -398,92 +391,117 @@ export default function FilmsPage() {
       ))}
     </>
   );
+  //#endregion
 
+  //#region RenderDetail
   const renderDetail = (
     <Modal open={openModalDetail} onClose={handleCloseModalDetail}>
-      <Box sx={modalTheme}>
-        {replaceVideoPoster ? (
-          <Box
-            sx={{
-              ":hover": {
-                cursor: "pointer",
-              },
-            }}
-          >
-            <iframe
-              height={300}
-              width={550}
-              src={film?.videoUrl}
-              allowTransparency
-            />
+      <Box>
+        <Box sx={modalTheme}>
+          <Box>
+            {replaceVideoPoster ? (
+              <Box
+                sx={{
+                  ":hover": {
+                    cursor: "pointer",
+                  },
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <iframe
+                  height={300}
+                  width={550}
+                  src={film?.videoUrl}
+                  allowTransparency
+                />
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  ":hover": {
+                    cursor: "pointer",
+                  },
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  style={{
+                    maxHeight: 300,
+                  }}
+                  src={film?.webUrl}
+                  alt={`poster ${film?.name}`}
+                  title={film?.name}
+                />
+              </Box>
+            )}
+            <Button
+              size="medium"
+              color="error"
+              onClick={() => setReplaceVideoPoster(!replaceVideoPoster)}
+            >
+              {replaceVideoPoster ? "STOP" : "PLAY"}
+            </Button>
           </Box>
-        ) : (
-          <Box
-            sx={{
-              ":hover": {
-                cursor: "pointer",
-              },
-            }}
-          >
-            <img
-              style={{
-                maxHeight: 300,
-              }}
-              src={film?.webUrl}
-              alt={`poster ${film?.name}`}
-              title={film?.name}
-            />
-          </Box>
-        )}
 
-        <Button
-          size="medium"
-          color="error"
-          onClick={() => setReplaceVideoPoster(!replaceVideoPoster)}
-        >
-          PLAY
-        </Button>
-        <Typography fontSize={20} fontWeight="bold" textTransform="uppercase">
-          Name: {film?.name}
-        </Typography>
-        <Typography>Producer: {producerOfFilm?.name}</Typography>
-        <Typography>Views: {film?.views}</Typography>
-        <Box className="dp-flex">
-          <Typography>Person:</Typography>
-          {personOfFilm.map((value, key) => (
-            <Typography
-              sx={{
-                ":hover": {
-                  cursor: "pointer",
-                },
-              }}
-              onClick={() => console.log(value.person.name)}
-              key={key}
-            >
-              {value.person.name}
-            </Typography>
-          ))}
-        </Box>
-        <Box className="dp-flex">
-          <Typography>Genres:</Typography>
-          {genreOfFilm.map((value, key) => (
-            <Typography
-              sx={{
-                ":hover": {
-                  cursor: "pointer",
-                },
-              }}
-              onClick={() => console.log(value.genre.name)}
-              key={key}
-            >
-              {value.genre.name}
-            </Typography>
-          ))}
+          <Typography
+            margin={1}
+            fontSize={20}
+            fontWeight="bold"
+            textTransform="uppercase"
+          >
+            Name: {film?.name}
+          </Typography>
+          <Typography>Describe: {film?.describe}</Typography>
+          <Typography>Views: {film?.views}</Typography>
+          <Typography>Producer: {film?.producer.name}</Typography>
+          <Box className="dp-flex">
+            <Typography>Persons:</Typography>
+            {film?.persons.map((value, key) => (
+              <Typography
+                key={key}
+                sx={{
+                  ":hover": {
+                    cursor: "pointer",
+                    color: "#cccd",
+                  },
+                }}
+              >
+                {value.person.name}
+              </Typography>
+            ))}
+          </Box>
+          <Box className="dp-flex">
+            <Typography>Genres:</Typography>
+            {film?.genres.map((value, key) => (
+              <Typography
+                sx={{
+                  ":hover": {
+                    cursor: "pointer",
+                    color: "#cccd",
+                  },
+                }}
+                onClick={() => console.log(value.genre.name)}
+                key={key}
+              >
+                {value.genre.name}
+              </Typography>
+            ))}
+          </Box>
         </Box>
       </Box>
     </Modal>
   );
+  //#endregion
 
+  const columns: GridColDef[] = [
+    { field: "name", headerName: "Name Genres", width: 120 },
+    { field: "created", headerName: "Created", width: 250 },
+  ];
+  //#region From Upload Film
   const renderUploadFilm = (
     <Modal open={openModal}>
       <Box
@@ -617,6 +635,28 @@ export default function FilmsPage() {
             />
           </div>
         </div>
+        <FormControl>
+          <RadioGroup
+            aria-labelledby="demo-radio-buttons-group-label"
+            defaultValue="female"
+            name="radio-buttons-group"
+          >
+            <Box>
+              <FormControlLabel
+                value="premium"
+                control={<Radio color="error" />}
+                label="Premium"
+                onClick={() => setPremium(true)}
+              />
+              <FormControlLabel
+                value="normal"
+                control={<Radio color="error" />}
+                label="Normal"
+                onClick={() => setPremium(false)}
+              />
+            </Box>
+          </RadioGroup>
+        </FormControl>
         <Box
           sx={{
             display: "flex",
@@ -628,29 +668,29 @@ export default function FilmsPage() {
             accept="video/*"
             onChange={(e) => selectVideo(e)}
           />
-          <Typography>Website Poster</Typography>
+          <Typography>Website</Typography>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => selectWebImg(e)}
           />
-          <Typography>Mobile Poster</Typography>
+          <Typography>Mobile</Typography>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => selectMobileImg(e)}
           />
         </Box>
-        {loadingUpload ? <LinearProgress color="secondary" /> : null}
+        {isUploading ? <LinearProgress color="secondary" /> : null}
         <div className="dp-flex">
-          <CustomButton text={"Sumit"} color="error" onClick={createFilm} />
           <CustomButton
-            text="Preview"
+            text="UPLOAD MEDIA CONTENT"
             color="warning"
             onClick={() => {
               uploadFilmContent();
             }}
           />
+          <CustomButton text={"Sumit"} color="error" onClick={createFilm} />
           <CustomButton
             text="Close"
             color="inherit"
@@ -660,34 +700,50 @@ export default function FilmsPage() {
       </Box>
     </Modal>
   );
+  //#endregion
+
+  const clean = () => {
+    setName("");
+    setProducer("");
+    setAge("");
+    setDesribe("");
+    setLength(0);
+    setGenreSelects([]);
+    setPersonSelects([]);
+    setVideoUpload(null);
+    setMobileImgUpload(null);
+    setWebImgUpload(null);
+  };
 
   return (
     <Box>
       {loading ? <LinearProgress color="secondary" /> : ""}
       <SubHeader
+        value={keyName}
+        onChange={(e: any) => onChangeKeyName(e)}
         addButton={handleOpenModal}
         refreshButton={() => getFilms()}
-        onChange={onChangeKeyName}
-        value={keyName}
       />
-      <div className="flex-wrap">
-        {resultSearchFilms.length > 0 ? RenderSearchFilmsResult : RenderFilms}
-      </div>
+      <div className="flex-wrap">{RenderFilms}</div>
       {renderDetail}
       <ConfirmDialog
         open={openDialog}
         title="Do you really want to delete it?"
         handleCancel={() => {
           setOpenDialog(false);
-          idFim.current = "";
         }}
         handleOk={() => {
-          deleteFilm(idFim.current);
-          //deleteObjectFirebase();
+          if (film == undefined) {
+            enqueueSnackbar("FILM UNDIFIND", { variant: "error" });
+          } else {
+            deleteObjectFirebase(film.mobileUrl);
+            deleteObjectFirebase(film.videoUrl);
+            deleteObjectFirebase(film.webUrl);
+            deleteFilm(film?.id);
+          }
         }}
       />
       {renderUploadFilm}
-      {previewView}
     </Box>
   );
 }

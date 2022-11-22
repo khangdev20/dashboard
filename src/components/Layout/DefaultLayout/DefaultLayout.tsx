@@ -1,4 +1,5 @@
 import { Box, Toolbar } from "@mui/material";
+import { memo } from "react";
 import Header from "../../Header/Header";
 import SiderBar from "../../Sider/SideBar";
 
@@ -21,4 +22,4 @@ const DefaultLayout = ({ children }: any) => {
   );
 };
 
-export default DefaultLayout;
+export default memo(DefaultLayout);

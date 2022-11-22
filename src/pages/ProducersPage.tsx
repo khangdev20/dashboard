@@ -17,29 +17,42 @@ export default function ProducersPage() {
   const { enqueueSnackbar } = useSnackbar();
   const [openModal, setOpenModal] = useState(false);
   const [data, setData] = useState<ProducerEntity[]>([]);
+  const [producer, setProducer] = useState<ProducerEntity>();
   const [name, setName] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
   const { callApi } = useApi();
   const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
 
-  const idProducer = useRef("");
+  const getProducerId = (id: string) => {
+    callApi<ProducerEntity>(REQUEST_TYPE.GET, `api/producers/${id}`)
+      .then((res) => {
+        setProducer(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const createProducer = () => {
     callApi(REQUEST_TYPE.POST, "api/producers/create", {
       name: name,
     })
-      .then(() => {
+      .then((res) => {
         enqueueSnackbar("Add Producer Success!", { variant: "success" });
         getProducers();
-        setName("");
         setOpenModal(false);
+        clean();
       })
       .catch((err) => {
         console.error(err);
         enqueueSnackbar("Add Producer Failed!", { variant: "error" });
       });
+  };
+  const clean = () => {
+    setName("");
   };
 
   const getProducers = useCallback(() => {
@@ -81,7 +94,11 @@ export default function ProducersPage() {
             name={value.name}
             handleDelete={() => {
               setOpenDialog(true);
-              idProducer.current = value.id;
+              getProducerId(value.id);
+            }}
+            handleDetail={() => {
+              getProducerId(value.id);
+              setOpenDetail(true);
             }}
           />
         ))}
@@ -91,7 +108,7 @@ export default function ProducersPage() {
         title={"Do you really want to delete?"}
         handleOk={() => {
           setOpenDialog(false);
-          deleteProducer(idProducer.current);
+          deleteProducer(producer!.id);
         }}
         handleCancel={() => setOpenDialog(false)}
       />
@@ -110,6 +127,21 @@ export default function ProducersPage() {
             text="CLOSE"
             onClick={handleCloseModal}
           />
+        </Box>
+      </Modal>
+      <Modal open={openDetail} onClose={() => setOpenDetail(false)}>
+        <Box sx={modalTheme}>
+          <Typography>{producer?.id}</Typography>
+          <Box className="dp-flex">
+            <Typography>Producer: </Typography>
+            <Typography>{producer?.name}</Typography>
+          </Box>
+          <Box className="dp-flex">
+            <Typography>Films: </Typography>
+            {producer?.films.map((value, key) => (
+              <Typography key={key}>{value.name}</Typography>
+            ))}
+          </Box>
         </Box>
       </Modal>
     </Box>

@@ -1,28 +1,46 @@
 import { Box, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
 
 export const NotFoundPage = () => {
+  const navigate = useNavigate();
   return (
     <Box
       display={"flex"}
       flexDirection={"column"}
       alignItems="center"
       justifyContent={"center"}
-      margin="auto"
-      marginTop={5}
-      padding={5}
-      borderRadius={5}
     >
       <img
         style={{
-          width: "30%",
-          height: "30%",
+          width: "45%",
+          height: "45%",
         }}
-        src="https://cdn.pixabay.com/photo/2021/07/21/12/49/error-6482984_1280.png"
+        src="https://www.psdstamps.com/wp-content/uploads/2019/12/warning-stamp-png.png"
       />
-      <Link to={"/login"}>
-        <Typography>YOU NEED LOGIN</Typography>
-      </Link>
+      <div
+        onClick={() => {
+          sessionStorage.removeItem("jwt");
+          navigate("/login");
+          window.location.reload();
+        }}
+      >
+        <Typography
+          sx={{
+            textTransform: "uppercase",
+            color: "red",
+            fontWeight: "bold",
+            fontSize: 20,
+            ":hover": {
+              cursor: "pointer",
+              color: "#333",
+            },
+          }}
+          title="move login page"
+        >
+          This page is for admins
+        </Typography>
+      </div>
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-export const baseUrl = "https://localhost:7043";
+export const baseUrl = "http://localhost:5043";
 export const styles = {
   position: "absolute" as "absolute",
   top: "50%",

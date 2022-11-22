@@ -1,6 +1,14 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { CustomSpeedDial } from "../components/Button/CustomSpeedDial";
-import { Modal, Box, Typography } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Typography,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 import { useSnackbar } from "notistack";
 import "./index.css";
 import { styles as modalTheme } from "../../src/containts";
@@ -17,8 +25,11 @@ export default function PersonsPage() {
   const { enqueueSnackbar } = useSnackbar();
   const [openModal, setOpenModal] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
+  const [person, setPerson] = useState<PersonEntity>();
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [sex, setSex] = useState(true);
+  const [describe, setDescribe] = useState("");
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
   const [data, setData] = useState<PersonEntity[]>([]);
@@ -31,7 +42,7 @@ export default function PersonsPage() {
     setName(e.target.value);
   };
   const onChangeDescribe = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(e.target.value);
+    setDescribe(e.target.value);
   };
 
   const getPersons = useCallback(() => {
@@ -47,11 +58,12 @@ export default function PersonsPage() {
   const createPerson = () => {
     callApi(REQUEST_TYPE.POST, "api/persons/create", {
       name: name,
-      description: description,
+      describe: describe,
+      sex: sex,
     })
       .then(() => {
         setName("");
-        setDescription("");
+        setDescribe("");
         setOpenModal(false);
         getPersons();
         enqueueSnackbar("Add Person Success!", { variant: "success" });
@@ -59,6 +71,16 @@ export default function PersonsPage() {
       .catch((err) => {
         console.error(err);
         enqueueSnackbar("Add Person Fail!", { variant: "error" });
+      });
+  };
+
+  const getPersonId = (id: string) => {
+    callApi<PersonEntity>(REQUEST_TYPE.GET, `api/persons/${id}`)
+      .then((res) => {
+        setPerson(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
       });
   };
 
@@ -87,13 +109,13 @@ export default function PersonsPage() {
           <CustomCard
             key={key}
             name={value.name}
-            describe={value.description}
             handleDelete={() => {
               setOpenDialog(true);
-              idPerson.current = value.id;
+              getPersonId(value.id);
             }}
             handleDetail={() => {
-              enqueueSnackbar("Chưa làm!", { variant: "error" });
+              getPersonId(value.id);
+              setOpenDetail(true);
             }}
           />
         ))}
@@ -101,8 +123,11 @@ export default function PersonsPage() {
       <ConfirmDialog
         open={openDialog}
         title="Do you really want to delete it?"
-        handleCancel={() => setOpenDialog(false)}
-        handleOk={() => deletePerson(idPerson.current)}
+        handleCancel={() => {
+          setOpenDialog(false);
+          setPerson(undefined);
+        }}
+        handleOk={() => deletePerson(person!.id)}
       />
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={modalTheme}>
@@ -116,9 +141,32 @@ export default function PersonsPage() {
           <CustomInput
             placeholder="Person Describe"
             label="Person Describe"
-            value={description}
+            value={describe}
             onChange={onChangeDescribe}
           />
+
+          <FormControl>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              defaultValue="male"
+              name="radio-buttons-group"
+            >
+              <Box>
+                <FormControlLabel
+                  value="male"
+                  control={<Radio color="error" />}
+                  label="Male"
+                  onClick={() => setSex(true)}
+                />
+                <FormControlLabel
+                  value="female"
+                  control={<Radio color="error" />}
+                  label="Female"
+                  onClick={() => setSex(false)}
+                />
+              </Box>
+            </RadioGroup>
+          </FormControl>
           <Box
             sx={{
               display: "flex",
@@ -130,6 +178,29 @@ export default function PersonsPage() {
               text="CLOSE"
               onClick={handleCloseModal}
             />
+          </Box>
+        </Box>
+      </Modal>
+      <Modal open={openDetail} onClose={() => setOpenDetail(false)}>
+        <Box sx={modalTheme}>
+          <Typography>{person?.id}</Typography>
+          <Box className="dp-flex">
+            <Typography>Person name:</Typography>
+            <Typography>{person?.name}</Typography>
+          </Box>
+          <Box className="dp-flex">
+            <Typography>Describe:</Typography>
+            <Typography>{person?.describe}</Typography>
+          </Box>
+          <Box className="dp-flex">
+            <Typography>Gioi tinh:</Typography>
+            <Typography>{person?.sex ? "Male" : "Female"}</Typography>
+          </Box>
+          <Box className="dp-flex">
+            <Typography>Films: </Typography>
+            {person?.films.map((value, key) => (
+              <Typography key={key}>{value.film.name}</Typography>
+            ))}
           </Box>
         </Box>
       </Modal>

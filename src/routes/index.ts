@@ -9,6 +9,7 @@ import ViewsPage from "../pages/ViewsPage"
 import SalesPage from "../pages/SalesPage"
 import LoginPage from "../pages/auth/Login/Login"
 import PackagePage from "../pages/PackagePage"
+import { NotFoundPage } from "../pages/NotFound/NotFoundPage"
 
 export const publicRoutes = [
   {path: '/dashboard', component: DashboardPage},
@@ -22,6 +23,7 @@ export const publicRoutes = [
   {path: '/sales', component: SalesPage},
   {path: '/packages', component: PackagePage},
   {path: '/login', component: LoginPage, layout: null},
+  {path: '/notfound', component: NotFoundPage, layout: null},
 ]
 
 

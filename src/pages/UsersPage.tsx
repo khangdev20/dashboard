@@ -5,12 +5,15 @@ import {
   TextField,
   MenuItem,
   LinearProgress,
-  Toolbar,
+  Popover,
+  Button,
+  IconButton,
+  CircularProgress,
+  Avatar,
 } from "@mui/material";
 import "./index.css";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import CustomButton from "../components/Button/CustomButton";
-import { CustomSpeedDial } from "../components/Button/CustomSpeedDial";
 import CustomInput from "../components/Input/CustomInput";
 import { styles as modalTheme } from "../containts";
 import { useSnackbar } from "notistack";
@@ -20,25 +23,91 @@ import { UserEntity } from "../models/UserEntity";
 import { CustomCard } from "../components/Card/CustomCard";
 import { ConfirmDialog } from "../components/Dialog/ConfirmDialog";
 import { SubHeader } from "../components/Header/SubHeader";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "../firebase/firebase";
+import { v4 } from "uuid";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { deleteObjectFirebase } from "../firebase/deleteObject";
+import { async } from "@firebase/util";
+import { url } from "inspector";
 
 export default function UsersPage() {
   const { enqueueSnackbar } = useSnackbar();
+
+  //#region useState
   const [openModal, setOpenModal] = useState(false);
+  const [passwordOld, setPasswordOld] = useState("");
+  const [passwordNew, setPassowordNew] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [openFormEdit, setOpenFormEdit] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [anchorElAvt, setAnchorElAvt] =
+    React.useState<HTMLButtonElement | null>(null);
+  const [user, setUser] = useState<UserEntity>();
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState(null);
-  console.log(avatar);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loadingAvt, setLoadingAvt] = useState(false);
   const [users, setUsers] = useState<UserEntity[]>([]);
-  const { callApi } = useApi();
+  //#endregion
+
+  //#region firebase
+  const selectAvatar = (e: any) => {
+    let selected = e.target.files[0];
+    if (!selected) return;
+    setAvatar(selected);
+    console.log(selected);
+  };
+
+  const idU = useRef("");
+
+  const handleOpenUpload = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElAvt(event.currentTarget);
+  };
+
+  const handleCloseUploadAvt = () => {
+    setAnchorElAvt(null);
+    setAvatar(null);
+  };
+
+  const uploadAvt = (id: string) => {
+    if (avatar == null) return;
+    const avatarRef = ref(storage, `avatars/${v4()}`);
+    console.log(avatar);
+    uploadBytes(avatarRef, avatar)
+      .then(() => {
+        getDownloadURL(avatarRef).then((url) => {
+          callApi(REQUEST_TYPE.PUT, `api/users/avt/${id}`, {
+            avatar: url,
+          })
+            .then(() => {
+              getUsers();
+              setAnchorElAvt(null);
+              enqueueSnackbar(`Change Avatar ${id} Success!`, {
+                variant: "success",
+              });
+            })
+            .catch(() => {
+              enqueueSnackbar(`Change Avatar ${id} Faild!`, {
+                variant: "error",
+              });
+            });
+        });
+      })
+      .catch((err) => {
+        enqueueSnackbar("ERROR", { variant: "error" });
+      })
+      .finally(() => setLoadingAvt(false));
+  };
+
   const idUser = useRef("");
 
+  //#region onChange
   const handleChangeTextSelect = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -65,13 +134,14 @@ export default function UsersPage() {
     setConfirmPassword(e.target.value);
   };
 
-  const selectAvatar = (e: any) => {
-    let selected = e.target.files[0];
-    if (!selected) return;
-    setAvatar(selected);
-    console.log(selected);
+  const onChangePasswordOld = (e: any) => {
+    setPasswordOld(e.target.value);
   };
 
+  const onChangePasswordNew = (e: any) => {
+    setPassowordNew(e.target.value);
+  };
+  //#endregion
   const roles = [
     {
       role: "User",
@@ -88,18 +158,18 @@ export default function UsersPage() {
     setConfirmPassword("");
     setPhone("");
     setRole("");
+    setAvatar(null);
   };
-
   const handleCloseModal = () => {
     setOpenModal(false);
     cleanUp();
   };
-  const handleOpenModal = () => {
-    setOpenModal(true);
-    cleanUp();
-  };
+
+  //#region Call Api
+  const { callApi } = useApi();
 
   const createUser = () => {
+    console.log("createUser");
     setLoading(true);
     callApi(REQUEST_TYPE.POST, "api/users/register", {
       name: name,
@@ -108,6 +178,8 @@ export default function UsersPage() {
       password: password,
       confirmPassword: confirmPassword,
       passwordOld: "",
+      avatar: "",
+      current: "",
       role: role,
     })
       .then(() => {
@@ -124,24 +196,39 @@ export default function UsersPage() {
       });
   };
 
-  const getUsers = useCallback(() => {
-    setLoading(true);
-    callApi<UserEntity[]>(REQUEST_TYPE.GET, "api/users")
+  const getUserId = async (id: string) => {
+    console.log("getUserId");
+    await callApi<UserEntity>(REQUEST_TYPE.GET, `api/users/u?id=${id}`)
       .then((res) => {
-        setLoading(false);
-        setUsers(res.data);
+        const respone = res.data;
+        setUser(respone);
+        setName(respone.name);
+        setPhone(respone.phone);
+        setEmail(respone.email);
+        setRole(respone.role);
       })
       .catch((err) => {
-        setLoading(false);
-        console.error(err);
+        console.log(err);
       });
+  };
+
+  const getUsers = useCallback(() => {
+    console.log("getUsers");
+    setLoading(true);
+    callApi<UserEntity[]>(REQUEST_TYPE.GET, "api/users").then((res) => {
+      setLoading(false);
+      setUsers(res.data);
+    });
   }, [callApi]);
+
+  useEffect(() => {
+    getUsers();
+  }, [getUsers]);
 
   const deleteUser = (id: string) => {
     setLoading(true);
     callApi(REQUEST_TYPE.DELETE, `api/users/${id}`)
       .then(() => {
-        idUser.current = "";
         setLoading(false);
         setOpenDialog(false);
         getUsers();
@@ -154,32 +241,96 @@ export default function UsersPage() {
       });
   };
 
-  useEffect(() => {
-    getUsers();
-  }, [getUsers]);
-
+  //#endregion
   return (
     <div>
       {loading ? <LinearProgress color="secondary" /> : ""}
-      <SubHeader addButton={handleOpenModal} refreshButton={() => getUsers()} />
+      <SubHeader
+        addButton={() => setOpenModal(true)}
+        refreshButton={() => getUsers()}
+      />
       <div className="flex-wrap">
         {users.map((value) => (
           <CustomCard
-            hideAvatar={true}
+            showAvatar={true}
             key={value.id}
             name={value.name}
             email={value.email}
             role={value.role}
             avatar={value.avatar}
+            onUploadAvatar={(e: any) => {
+              handleOpenUpload(e);
+              getUserId(value.id);
+            }}
             handleDelete={() => {
               setOpenDialog(true);
-              idUser.current = value.id;
+              getUserId(value.id);
             }}
             handleEdit={() => {
               setOpenFormEdit(true);
+              getUserId(value.id);
+            }}
+            handleDetail={() => {
+              setOpenDetail(true);
+              getUserId(value.id);
             }}
           />
         ))}
+        <Popover
+          open={Boolean(anchorElAvt)}
+          anchorEl={anchorElAvt}
+          onClose={() => {
+            handleCloseUploadAvt();
+          }}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          <Box
+            sx={{
+              padding: 2,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {avatar == null ? null : (
+              <img
+                height={100}
+                width={100}
+                style={{
+                  borderRadius: "50%",
+                  marginRight: 20,
+                }}
+                src={URL.createObjectURL(avatar)}
+              />
+            )}
+
+            <input
+              type={"file"}
+              accept="image/*"
+              title="avatar"
+              onChange={selectAvatar}
+            />
+            <IconButton
+              onClick={() => {
+                console.log("Upload");
+                if (user?.avatar != "") {
+                  uploadAvt(user!.id);
+                  deleteObjectFirebase(user!.avatar);
+                  setLoadingAvt(true);
+                } else {
+                  uploadAvt(user!.id);
+                  setLoadingAvt(true);
+                }
+              }}
+            >
+              <CloudUploadIcon fontSize="large" color="error" />
+            </IconButton>
+          </Box>
+          {loadingAvt ? <LinearProgress color="secondary" /> : ""}
+        </Popover>
       </div>
       <ConfirmDialog
         open={openDialog}
@@ -268,34 +419,19 @@ export default function UsersPage() {
               onChange={onChangeName}
             />
             <CustomInput
-              placeholder="Email"
-              label="Email"
-              value={email}
-              onChange={onChangeEmail}
+              placeholder="Phone"
+              label="Phone"
+              value={phone}
+              onChange={onChangePhone}
+              disabled={true}
             />
           </Box>
           <CustomInput
-            placeholder="Phone"
-            label="Phone"
-            value={phone}
-            onChange={onChangePhone}
+            disabled={true}
+            placeholder="Email"
+            label="Email"
+            value={email}
           />
-          <Box className="dp-flex">
-            <CustomInput
-              placeholder="Password Old"
-              label="Password Old"
-              value={password}
-              onChange={onChangePassword}
-              icon={true}
-            />
-            <CustomInput
-              placeholder="Password New"
-              label="Password New"
-              value={confirmPassword}
-              onChange={onChangeConfirmPassword}
-              icon={true}
-            />
-          </Box>
           <TextField
             select
             fullWidth
@@ -310,28 +446,13 @@ export default function UsersPage() {
               </MenuItem>
             ))}
           </TextField>
-          {avatar == null ? null : (
-            <img
-              height={100}
-              width={100}
-              style={{
-                borderRadius: 100,
-              }}
-              src={URL.createObjectURL(avatar)}
-            />
-          )}
-          <input
-            type={"file"}
-            accept="image/*"
-            title="avatar"
-            onChange={selectAvatar}
-          />
+
           <Box
             sx={{
               display: "flex",
             }}
           >
-            <CustomButton color="error" text="SUBMIT" onClick={createUser} />
+            <CustomButton color="error" text="SUBMIT EDIT" />
             <CustomButton
               color="inherit"
               text="CLOSE"
@@ -340,6 +461,54 @@ export default function UsersPage() {
                 cleanUp();
               }}
             />
+          </Box>
+        </Box>
+      </Modal>
+
+      <Modal
+        open={openDetail}
+        onClose={() => {
+          setOpenDetail(false);
+          setUser(undefined);
+        }}
+      >
+        <Box sx={modalTheme}>
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+            }}
+          >
+            <Avatar
+              sx={{
+                textAlign: "end",
+                width: 200,
+                height: 200,
+                ":hover": {
+                  boxShadow: 4,
+                },
+              }}
+              title={name}
+              src={user?.avatar != "" ? user?.avatar : ""}
+            />
+            <Box
+              sx={{
+                ml: 5,
+              }}
+            >
+              <Box className="dp-flex">
+                <Typography>UserName : </Typography>
+                <Typography>{user?.name}</Typography>
+              </Box>
+              <Box className="dp-flex">
+                <Typography>Email : </Typography>
+                <Typography>{user?.email}</Typography>
+              </Box>
+              <Box className="dp-flex">
+                <Typography>Role : </Typography>
+                <Typography>{user?.role}</Typography>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Modal>

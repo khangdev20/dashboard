@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
-import React, { useState, useContext, useRef } from "react";
+import React, { memo, useState, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import { OpenDrawer } from "../Header/Header";
 import { SideData } from "./SideData";
@@ -18,7 +18,7 @@ interface Props {
   Window?: () => Window;
 }
 
-export default function SiderBar({ handleCloseDrawer }: any, props: Props) {
+function SideBar({ handleCloseDrawer }: any, props: Props) {
   const { window }: any = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const fake = useContext(OpenDrawer);
@@ -115,3 +115,4 @@ export default function SiderBar({ handleCloseDrawer }: any, props: Props) {
     </Box>
   );
 }
+export default SideBar;

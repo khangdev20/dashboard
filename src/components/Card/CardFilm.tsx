@@ -11,14 +11,17 @@ import Toolbar from "@mui/material/Toolbar";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
+import { PremiumTag } from "../Tag/PremiumTag";
 
 export const CardFilm = ({
   src,
   onClick,
-  handleDelete,
-  handleDetail,
-  handleEdit,
+  onDelete,
+  onDetail,
+  onEdit,
   posterTitle,
+  genres,
+  premium,
 }: any) => {
   return (
     <div>
@@ -35,6 +38,8 @@ export const CardFilm = ({
         }}
         onClick={onClick}
       >
+        {premium ? <PremiumTag /> : ""}
+        <Typography>{genres}</Typography>
         <img
           height="335px"
           width="215px"
@@ -49,13 +54,13 @@ export const CardFilm = ({
               justifyContent: "center",
             }}
           >
-            <IconButton onClick={handleDelete}>
+            <IconButton onClick={onDelete}>
               <DeleteIcon color="error" />
             </IconButton>
-            <IconButton onClick={handleEdit}>
+            <IconButton onClick={onEdit}>
               <EditIcon color="error" />
             </IconButton>
-            <IconButton onClick={handleDetail}>
+            <IconButton onClick={onDetail}>
               <InfoIcon color="error" />
             </IconButton>
           </CardActions>

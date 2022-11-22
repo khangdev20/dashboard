@@ -1,22 +1,21 @@
 import {
-  alpha,
-  Box,
   IconButton,
   InputBase,
   styled,
+  TextField,
   Toolbar,
 } from "@mui/material";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { text } from "stream/consumers";
+import { useState } from "react";
 
 export const SubHeader = ({
-  searchButton,
   addButton,
   refreshButton,
   onChange,
   value,
-  onSubmit,
 }: any) => {
   const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -60,7 +59,11 @@ export const SubHeader = ({
   }));
 
   return (
-    <Toolbar>
+    <Toolbar
+      sx={{
+        height: 100,
+      }}
+    >
       <IconButton onClick={addButton}>
         <AddToQueueIcon color="error" fontSize="medium" />
       </IconButton>
@@ -68,12 +71,7 @@ export const SubHeader = ({
         <SearchIconWrapper>
           <SearchIcon color="error" fontSize="medium" />
         </SearchIconWrapper>
-        <StyledInputBase
-          placeholder="Search…"
-          inputProps={{ "aria-label": "search" }}
-          onChange={onChange}
-          value={value}
-        />
+        <StyledInputBase placeholder="Search…" />
       </Search>
       <IconButton onClick={refreshButton}>
         <RefreshIcon color="error" fontSize="medium" />

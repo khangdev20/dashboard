@@ -2,10 +2,9 @@ import React from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Avatar, Badge, Box, IconButton } from "@mui/material";
+import { Avatar, Badge, Box, IconButton, Tooltip } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -14,7 +13,8 @@ import InfoIcon from "@mui/icons-material/Info";
 
 export const CustomCard = ({
   name,
-  hideAvatar,
+  showAvatar,
+  onUploadAvatar,
   email,
   phone,
   handleDelete,
@@ -64,19 +64,25 @@ export const CustomCard = ({
             >
               {name}
             </Typography>
-            {hideAvatar ? (
-              <Avatar
-                sx={{
-                  mr: 1,
-                  textAlign: "end",
-                }}
-                alt={"avata" + name}
-                src={
-                  avatar != ""
-                    ? avatar
-                    : "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/default-avatar-1.png"
-                }
-              />
+            {showAvatar ? (
+              <div onClick={onUploadAvatar}>
+                <Avatar
+                  sx={{
+                    textAlign: "end",
+                    width: 50,
+                    height: 50,
+                    ":hover": {
+                      boxShadow: 4,
+                    },
+                  }}
+                  title={name}
+                  src={
+                    avatar != ""
+                      ? avatar
+                      : "https://haycafe.vn/wp-content/uploads/2021/11/Anh-avatar-dep-chat-lam-hinh-dai-dien.jpg"
+                  }
+                />
+              </div>
             ) : null}
           </Box>
           <Typography>{email}</Typography>

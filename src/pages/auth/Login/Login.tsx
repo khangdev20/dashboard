@@ -2,10 +2,10 @@ import CustomBox from "../../../components/Box/CustomBox";
 import CustomButton from "../../../components/Button/CustomButton";
 import CustomInput from "../../../components/Input/CustomInput";
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, memo } from "react";
 import { baseUrl } from "../../../containts";
 import { useNavigate } from "react-router-dom";
-import { Box, LinearProgress } from "@mui/material";
+import { Box, LinearProgress, TextField } from "@mui/material";
 import { useSnackbar } from "notistack";
 
 export default function Login() {
@@ -25,11 +25,11 @@ export default function Login() {
   useEffect(() => {
     getIP();
   }, [getIP]);
-  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeEmail = (e: any) => {
     setEmail(e.target.value);
   };
 
-  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangePassword = (e: any) => {
     setPassword(e.target.value);
   };
 
@@ -82,15 +82,23 @@ export default function Login() {
             alt="LOGO"
             src="https://cdn.discordapp.com/attachments/1019968445418319914/1033082905985028226/codeflix-logo.png"
           />
-          <CustomInput
+          {/* <CustomInput
             margin="normal"
             placeholder="Email"
             label="Email"
             type="email"
             value={email}
             onChange={onChangeEmail}
+          /> */}
+          <TextField
+            margin="normal"
+            placeholder="Email"
+            label="Email"
+            type="email"
+            value={email}
+            onChange={onChangeEmail}
+            fullWidth
           />
-
           <CustomInput
             margin="normal"
             placeholder="Password"
