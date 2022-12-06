@@ -10,6 +10,11 @@ import SalesPage from "../pages/SalesPage"
 import LoginPage from "../pages/auth/Login/Login"
 import PackagePage from "../pages/PackagePage"
 import { NotFoundPage } from "../pages/NotFound/NotFoundPage"
+import { DetailFilm } from "../pages/DetailFilm"
+import DetailUser from "../pages/DetailUser"
+import UploadPage from "../pages/UploadPage"
+import DetailPerson from "../pages/DetailPerson";
+import RankingPage from "../pages/RankingPage";
 
 export const publicRoutes = [
   {path: '/dashboard', component: DashboardPage},
@@ -24,6 +29,12 @@ export const publicRoutes = [
   {path: '/packages', component: PackagePage},
   {path: '/login', component: LoginPage, layout: null},
   {path: '/notfound', component: NotFoundPage, layout: null},
+  {path: '/films/:filmId', component: DetailFilm},
+  {path: '/users/:userId', component: DetailUser},
+  {path: '/films/upload', component: UploadPage, layout: null },
+  {path: '/persons/:personId', component: DetailPerson },
+  {path: '/rankings', component: RankingPage },
+
 ]
 
 

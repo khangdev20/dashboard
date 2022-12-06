@@ -18,9 +18,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "frappe-charts": [
+        "node_modules/frappe-charts/dist/frappe-charts.min.esm.js"
+      ]
+    }
   },
   "include": [
     "src"
-  ]
+  ],
+
 }

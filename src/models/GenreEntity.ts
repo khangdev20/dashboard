@@ -1,5 +1,8 @@
+import {GenreFilmEntity} from "./GenreFilmEntity"
+
 export interface GenreEntity {
-  id: string,
-  name: string
-  created: Date
+    id: string,
+    name: string;
+    films: GenreFilmEntity[];
+    created: Date
 }

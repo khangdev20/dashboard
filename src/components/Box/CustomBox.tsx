@@ -9,7 +9,7 @@ export default function CustomBox(props: any) {
       alignItems="center"
       justifyContent={"center"}
       margin="auto"
-      marginTop={5}
+      marginTop={10}
       padding={5}
       borderRadius={5}
       boxShadow={"5px 5px 10px #ccc"}

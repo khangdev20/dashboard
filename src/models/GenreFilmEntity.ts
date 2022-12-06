@@ -1,10 +1,10 @@
-import { FilmEntity } from "./FilmEnity";
-import { GenreEntity } from "./GenreEntity";
-import { PersonEntity } from "./PersonEntity";
+import {FilmEntity} from "./FilmEnity";
+import {GenreEntity} from "./GenreEntity";
 
 export interface GenreFilmEntity {
-  genreId: string,
-  filmId: string,
-  genre: GenreEntity
-  film: FilmEntity
+    id: string,
+    genreId: string,
+    filmId: string,
+    genre: GenreEntity
+    film: FilmEntity
 }

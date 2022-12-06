@@ -1,9 +1,11 @@
-import { PackageEntity } from "./PackageEntity";
-import { UserEntity } from "./UserEntity";
+import { WalletEntity } from "./WalletEntity";
 
 export interface TransactionEntity {
   id: string;
-  package: PackageEntity;
-  user: UserEntity;
+  walletId: string,
+  packageName: string;
+  wallet: WalletEntity;
+  price: number,
+  time: number,
   created: Date,
 }

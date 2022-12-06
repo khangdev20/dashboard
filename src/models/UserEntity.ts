@@ -1,20 +1,20 @@
 import { HistoryEntity } from "./HistoryEntity";
-import { OrderEntity } from "./OrderEntity";
 import { PlayListEntity } from "./PlayListEntity";
-import { TransactionEntity } from "./TransactionEntity";
+import { WalletEntity } from "./WalletEntity";
 
 export interface UserEntity {
   id: string,
   created: Date,
-  playlists: PlayListEntity[],
-  orders: OrderEntity[],
+  playLists: PlayListEntity[],
   histories: HistoryEntity[],
-  transaction: TransactionEntity[]
+  wallet: WalletEntity,
   name: string,
   avatar: string,
   sex: boolean, 
+  premium: boolean,
   phone: string,
   email: string;
   role: string,
+  dateUse: Date,
   current: string,
 }

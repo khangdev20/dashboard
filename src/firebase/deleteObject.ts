@@ -8,7 +8,7 @@ export const deleteObjectFirebase = (value: string) => {
       console.log("delete ok!" + value);
     })
     .catch((err) => {
-      console.log("delete fail!" + err)
+      console.log("delete faild!" + err)
     });
 };
 

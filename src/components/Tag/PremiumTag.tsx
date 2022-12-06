@@ -1,15 +1,16 @@
 import React from "react";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import { Box } from "@mui/material";
+import {Box} from "@mui/material";
 
 export const PremiumTag = () => {
-  return (
-    <Box
-      sx={{
-        position: "absolute",
-      }}
-    >
-      <BookmarkIcon fontSize="large" color="warning" />
-    </Box>
-  );
+    return (
+        <Box
+            sx={{
+                position: "absolute",
+                p: 1
+            }}
+        >
+            <BookmarkIcon fontSize="large" color="warning"/>
+        </Box>
+    );
 };

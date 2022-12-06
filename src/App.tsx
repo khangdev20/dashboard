@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Login from "./pages/auth/Login/Login";
 import "./App.css";
 import { publicRoutes } from "./routes/index";
@@ -22,7 +22,10 @@ function App() {
         console.error(err);
       });
   };
-  setInterval(getNewToken, 27000000);
+
+  useEffect(() => {
+    const time = setInterval(getNewToken, 1800000);
+  }, []);
 
   return (
     <SnackbarProvider autoHideDuration={2000} maxSnack={6}>

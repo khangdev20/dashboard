@@ -7,4 +7,5 @@ export interface PersonEntity {
   sex: boolean;
   films: PersonFilmEntity[];
   describe: string
+  avatar: string
 }

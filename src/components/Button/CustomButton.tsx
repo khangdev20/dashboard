@@ -11,6 +11,7 @@ export default function CustomButton({ onClick, color, text, type }: any) {
       fullWidth
       variant="contained"
       color={color}
+      type="submit"
     >
       {text}
     </Button>
