@@ -10,11 +10,14 @@ import SalesPage from "../pages/SalesPage"
 import LoginPage from "../pages/auth/Login/Login"
 import PackagePage from "../pages/PackagePage"
 import { NotFoundPage } from "../pages/NotFound/NotFoundPage"
-import { DetailFilm } from "../pages/DetailFilm"
-import DetailUser from "../pages/DetailUser"
+import { DetailFilm } from "../pages/detail/DetailFilm"
+import DetailUser from "../pages/detail/DetailUser"
 import UploadPage from "../pages/UploadPage"
-import DetailPerson from "../pages/DetailPerson";
+import DetailPerson from "../pages/detail/DetailPerson";
 import RankingPage from "../pages/RankingPage";
+import DetailProducer from "../pages/detail/DetailProducer";
+import EditUser from "../pages/edit/EditUser";
+import DetailSales from "../pages/detail/DetailSales";
 
 export const publicRoutes = [
   {path: '/dashboard', component: DashboardPage},
@@ -34,7 +37,8 @@ export const publicRoutes = [
   {path: '/films/upload', component: UploadPage, layout: null },
   {path: '/persons/:personId', component: DetailPerson },
   {path: '/rankings', component: RankingPage },
-
+  {path: '/users/edit/:userId', component: EditUser },
+  {path: '/sales/:salesId', component: DetailSales },
 ]
 
 

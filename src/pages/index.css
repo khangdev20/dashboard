@@ -30,3 +30,8 @@
 .just-center {
   justify-content: center;
 }
+
+.style-header-grid {
+    text-decoration: underline;
+    color: red;
+}

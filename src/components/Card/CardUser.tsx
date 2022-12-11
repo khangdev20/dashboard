@@ -22,7 +22,8 @@ const CardUser = ({
                       role,
                       date,
                       email,
-                      iconNone
+                      iconNone,
+                      onChoose
                   }: any) => {
     const mo = new Intl.NumberFormat("vi-VN", {
         style: "currency",
@@ -39,18 +40,22 @@ const CardUser = ({
             }}
         >
             {premium ? <WorkspacePremiumIcon color="warning" fontSize="large"/> : ""}
-            <Avatar
-                sx={{
-                    textAlign: "end",
-                    width: 200,
-                    m: 2,
-                    height: 200,
-                    ":hover": {
-                        boxShadow: 4,
-                    },
-                }}
-                src={avatar != "" ? avatar : ""}
-            />
+            {avatar ?
+                <Avatar
+                    sx={{
+                        textAlign: "end",
+                        width: 200,
+                        m: 2,
+                        height: 200,
+                        ":hover": {
+                            boxShadow: 4,
+                            cursor: 'pointer'
+                        },
+                    }}
+                    src={avatar !== "" ? avatar : ""}
+                    onClick={onChoose}
+                /> : null
+            }
             <Box
                 sx={{
                     ml: 4,
@@ -72,11 +77,15 @@ const CardUser = ({
                         >
                             {name}
                         </Typography>
-                        {sex ? (
-                            <Male sx={{ml: 1}} fontSize="large" color="primary"/>
-                        ) : (
-                            <FemaleIcon sx={{ml: 1}} fontSize="large" color="secondary"/>
-                        )}
+                        {sex ?
+                            <Box>
+                                {sex ? (
+                                    <Male sx={{ml: 1}} fontSize="large" color="primary"/>
+                                ) : (
+                                    <FemaleIcon sx={{ml: 1}} fontSize="large" color="secondary"/>
+                                )}
+                            </Box> : null
+                        }
                     </Box>
                     {email ? <Box className="dp-flex-height" margin={2}>
                         <EmailIcon sx={{mr: 2}}/>

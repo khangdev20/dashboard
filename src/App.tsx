@@ -24,7 +24,7 @@ function App() {
   };
 
   useEffect(() => {
-    const time = setInterval(getNewToken, 1800000);
+    setInterval(getNewToken, 1800000);
   }, []);
 
   return (

@@ -40,9 +40,14 @@ function SideBar({handleCloseDrawer}: any, props: Props) {
                     color: "red",
                 }}
             >
-                <Typography> HELLO ADMIN</Typography>
+                <Box m={-5}>
+                    <img alt={""} height={100} src={"https://img.pikbest.com/png-images/20191113/santa-gives-gifts-gif_2515372.png!bw700"}/>
+                </Box>
+                <Box m={-5} position={'absolute'} left={0}>
+                    <img alt={''} width={200}
+                         src={"https://img1.picmix.com/output/stamp/normal/4/5/9/5/1705954_8491b.gif"}/>
+                </Box>
             </Toolbar>
-            <Divider/>
             <List disablePadding>
                 {SideData.map((value, key) => (
                     <Link

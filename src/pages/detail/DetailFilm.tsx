@@ -9,27 +9,27 @@ import {
 import React, {useCallback, useEffect, useRef, useState} from "react";
 
 import {useNavigate, useParams} from "react-router-dom";
-import {REQUEST_TYPE} from "../Enums/RequestType";
-import {FilmEntity} from "../models/FilmEnity";
+import {REQUEST_TYPE} from "../../Enums/RequestType";
+import {FilmEntity} from "../../models/FilmEnity";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import Fab from '@mui/material/Fab';
-import "./index.css";
-import {useApi} from "../hooks/useApi";
+import "../index.css";
+import {useApi} from "../../hooks/useApi";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {useSnackbar} from "notistack";
 import SendIcon from "@mui/icons-material/Send";
-import CardComment from "../components/Card/CardComment";
-import ListContainer from "../components/List/ListContainer";
-import CardItem from "../components/Card/CardItem";
-import BoxContainer from "../components/Box/BoxContainer";
-import ButtonEdit from "../components/Button/ButtonEdit";
+import CardComment from "../../components/Card/CardComment";
+import ListContainer from "../../components/List/ListContainer";
+import CardItem from "../../components/Card/CardItem";
+import BoxContainer from "../../components/Box/BoxContainer";
+import ButtonEdit from "../../components/Button/ButtonEdit";
 import {
     HubConnection,
 } from "@microsoft/signalr";
 import AddIcon from "@mui/icons-material/Add";
-import {GenreEntity} from "../models/GenreEntity";
-import {PersonEntity} from "../models/PersonEntity";
+import {GenreEntity} from "../../models/GenreEntity";
+import {PersonEntity} from "../../models/PersonEntity";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 
 export const DetailFilm = () => {
@@ -179,10 +179,15 @@ export const DetailFilm = () => {
                             ":hover": {
                                 cursor: "pointer",
                             },
+                            maxHeight: 500,
+                            maxWidth:1000,
+                            justifyContent: 'center',
+                            display: 'flex'
                         }}
                     >
                         <CardMedia
-                            component={"iframe"}
+                            controls
+                            component={"video"}
                             src={film?.videoUrl}/>
                     </Card>
                 ) : (

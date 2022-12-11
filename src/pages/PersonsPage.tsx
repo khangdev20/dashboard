@@ -7,7 +7,7 @@ import {
     FormControl,
     RadioGroup,
     FormControlLabel,
-    Radio, Avatar,
+    Radio, Avatar, IconButton, Button,
 } from "@mui/material";
 import {useSnackbar} from "notistack";
 import "./index.css";
@@ -24,6 +24,10 @@ import FemaleIcon from "@mui/icons-material/Female";
 import MaleIcon from "@mui/icons-material/Male";
 import {useNavigate} from "react-router-dom";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ButtonOutlined from "../components/Button/ButtonOutlined";
+import AddIcon from "@mui/icons-material/Add";
+import {AddCircle} from "@mui/icons-material";
 
 export default function PersonsPage() {
     const {enqueueSnackbar} = useSnackbar();
@@ -114,9 +118,23 @@ export default function PersonsPage() {
     };
 
     const columnPerson: GridColDef[] = [
-        {field: "avatar", headerName: "Avatar", width: 100, renderCell: params => <Avatar src={params.value}/>},
-        {field: "name", headerName: "User name", width: 250},
-        {field: "sex", headerName: "Sex", width: 200, renderCell: params => params.value ? "Male" : "Female"},
+        {
+            field: "avatar",
+            renderHeader: params => <Typography className={"style-header-grid"}>Avatar</Typography>,
+            width: 200,
+            renderCell: params => <Avatar src={params.value}/>
+        },
+        {
+            field: "name",
+            renderHeader: params => <Typography className={"style-header-grid"}>User Name</Typography>,
+            width: 250
+        },
+        {
+            field: "sex",
+            renderHeader: params => <Typography className={"style-header-grid"}>Sex</Typography>,
+            width: 200,
+            renderCell: params => params.value ? "Male" : "Female"
+        },
     ];
 
     useEffect(() => {
@@ -124,42 +142,36 @@ export default function PersonsPage() {
     }, [getPersons]);
     return (
         <Box>
-            <SubHeader addButton={handleOpenModal}/>
-            {/*<div className="flex-wrap">*/}
-            {/*    {data.map((value, key) => (*/}
-            {/*        <CustomCard*/}
-            {/*            showAvatar={true}*/}
-            {/*            key={key}*/}
-            {/*            avatar={value.avatar}*/}
-            {/*            name={value.name}*/}
-            {/*            handleDelete={() => {*/}
-            {/*                setOpenDialog(true);*/}
-            {/*                getPersonId(value.id);*/}
-            {/*            }}*/}
-            {/*            handleDetail={() => {*/}
-            {/*                getPersonId(value.id);*/}
-            {/*                // setOpenDetail(true);*/}
-            {/*                navigate(`${value.id}`)*/}
-            {/*            }}*/}
-            {/*        />*/}
-            {/*    ))}*/}
-            {/*</div>*/}
             <Box sx={{
-                width: '100%',
                 height: 500,
                 ":hover": {
                     cursor: 'pointer'
-                }
+                },
             }}>
                 <DataGrid
                     rows={data}
                     columns={columnPerson}
                     pageSize={5}
                     rowsPerPageOptions={[5]}
-                    onCellClick={(itm) => {
+                    onCellDoubleClick={(itm) => {
                         navigate(`${itm.id}`)
                     }}
+                    checkboxSelection
                 />
+            </Box>
+            <Box margin={1}>
+                <ButtonOutlined onClick={handleOpenModal}>
+                    ADD NEW PERSON!
+                    <AddIcon fontSize={'small'}/>
+                </ButtonOutlined>
+                <ButtonOutlined color={'error'}>
+                    DELETE USER IS SELECTED!
+                    <DeleteIcon fontSize={'small'}/>
+                </ButtonOutlined>
+                <ButtonOutlined color={'success'} onClick={() => alert("add")}>
+                    ADD PERSON TO FILM!
+                    <AddCircle fontSize={'small'}/>
+                </ButtonOutlined>
             </Box>
             <ConfirmDialog
                 open={openDialog}
@@ -172,48 +184,50 @@ export default function PersonsPage() {
             />
             <Modal open={openModal} onClose={handleCloseModal}>
                 <Box sx={modalTheme}>
-                    <form onSubmit={(e) => e.preventDefault() }>
-                        <Typography>ADD Person</Typography>
-                        <CustomInput
-                            placeholder="Person Name"
-                            label="Person Name"
-                            value={name}
-                            onChange={onChangeName}
-                        />
-                        <CustomInput
-                            placeholder="Person Describe"
-                            label="Person Describe"
-                            value={describe}
-                            onChange={onChangeDescribe}
-                        />
-                        <CustomInput
-                            placeholder="Person Avatar"
-                            label="Person Avatar"
-                            value={avatar}
-                            onChange={onChangeAvatar}
-                        />
-                        <FormControl>
-                            <RadioGroup
-                                aria-labelledby="demo-radio-buttons-group-label"
-                                defaultValue="male"
-                                name="radio-buttons-group"
-                            >
-                                <Box>
-                                    <FormControlLabel
-                                        value="male"
-                                        control={<Radio color="error"/>}
-                                        label="Male"
-                                        onClick={() => setSex(true)}
-                                    />
-                                    <FormControlLabel
-                                        value="female"
-                                        control={<Radio color="error"/>}
-                                        label="Female"
-                                        onClick={() => setSex(false)}
-                                    />
-                                </Box>
-                            </RadioGroup>
-                        </FormControl>
+                    <form onSubmit={(e) => e.preventDefault()}>
+                        <Box display={'flex'} flexDirection={'column'} width={400} alignItems={'center'}>
+                            <Typography>ADD Person</Typography>
+                            <CustomInput
+                                placeholder="Person Name"
+                                label="Person Name"
+                                value={name}
+                                onChange={onChangeName}
+                            />
+                            <CustomInput
+                                placeholder="Person Describe"
+                                label="Person Describe"
+                                value={describe}
+                                onChange={onChangeDescribe}
+                            />
+                            <CustomInput
+                                placeholder="Person Avatar"
+                                label="Person Avatar"
+                                value={avatar}
+                                onChange={onChangeAvatar}
+                            />
+                            <FormControl>
+                                <RadioGroup
+                                    aria-labelledby="demo-radio-buttons-group-label"
+                                    defaultValue="male"
+                                    name="radio-buttons-group"
+                                >
+                                    <Box>
+                                        <FormControlLabel
+                                            value="male"
+                                            control={<Radio color="error"/>}
+                                            label="Male"
+                                            onClick={() => setSex(true)}
+                                        />
+                                        <FormControlLabel
+                                            value="female"
+                                            control={<Radio color="error"/>}
+                                            label="Female"
+                                            onClick={() => setSex(false)}
+                                        />
+                                    </Box>
+                                </RadioGroup>
+                            </FormControl>
+                        </Box>
                         <Box
                             sx={{
                                 display: "flex",

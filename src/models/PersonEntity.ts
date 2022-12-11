@@ -1,4 +1,3 @@
-import { FilmEntity } from "./FilmEnity"
 import { PersonFilmEntity } from "./PersonFilmEntity"
 
 export interface PersonEntity {

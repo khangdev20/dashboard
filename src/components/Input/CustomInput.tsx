@@ -12,7 +12,6 @@ export default function CustomInput({
                                         onChange,
                                         error,
                                         disabled,
-                                        color
                                     }: any) {
     const [typeText, setTypeText] = useState(false);
 

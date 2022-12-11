@@ -5,7 +5,7 @@ import axios from "axios";
 import {useCallback, useEffect, useState, memo} from "react";
 import {baseUrl} from "../../../containts";
 import {useNavigate} from "react-router-dom";
-import {Box, LinearProgress, TextField} from "@mui/material";
+import {Backdrop, Box, CircularProgress, LinearProgress, TextField} from "@mui/material";
 import {useSnackbar} from "notistack";
 
 export default function Login() {
@@ -61,9 +61,14 @@ export default function Login() {
 
     return (
         <div>
-            {loading ? (
-                <LinearProgress color="secondary"/>
-            ) : null}
+            {/*{loading ? (*/}
+            {/*    <LinearProgress color="secondary"/>*/}
+            {/*) : null}*/}
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading}>
+                <CircularProgress color={"error"}/>
+            </Backdrop>
             <form onSubmit={submitForm}>
                 {loading ?? (
                     <LinearProgress
@@ -94,12 +99,12 @@ export default function Login() {
                         margin="normal"
                         placeholder="Password"
                         label="Password"
-                        type="email"
+                        type="submit"
                         icon={true}
                         value={password}
                         onChange={onChangePassword}
                     />
-                    <CustomButton onClick={handleLogin} text="LOGIN" color={"error"}/>
+                    <CustomButton type={'submit'} onClick={handleLogin} text="LOGIN" color={"error"}/>
                 </CustomBox>
             </form>
         </div>

@@ -35,18 +35,16 @@ const UploadPage = () => {
     const [genres, setGenres] = useState<GenreEntity[]>([]);
     const [persons, setPersons] = useState<PersonEntity[]>([]);
     const [producers, setProducers] = useState<ProducerEntity[]>([]);
-    const [loading, setLoading] = useState(false);
     const [personSelects, setPersonSelects] = useState<GridRowId[]>([]);
     const [genreSelects, setGenreSelects] = useState<GridRowId[]>([]);
     const [name, setName] = useState("");
-    const [describe, setDesribe] = useState("");
+    const [describe, setDescribe] = useState("");
     const [videoUrl, setVideoUrl] = useState("");
     const [mobileUrl, setMobileUrl] = useState("");
     const [webUrl, setWebUrl] = useState("");
     const [age, setAge] = useState("");
     const [length, setLength] = useState(0);
     const [producer, setProducer] = useState("");
-    const [keyName, setKeyName] = useState("");
     const [isUploading, setIsUploading] = useState(false);
     const [premium, setPremium] = useState(false);
     const navigate = useNavigate();
@@ -60,17 +58,16 @@ const UploadPage = () => {
     const onChangeName = (e: any) => {
         setName(e.target.value);
     };
-    const onChangeLenght = (e: any) => {
+    const onChangeLength = (e: any) => {
         setLength(e.target.value);
     };
     const onChangeDescribe = (e: any) => {
-        setDesribe(e.target.value);
+        setDescribe(e.target.value);
     };
 
     const [videoUpload, setVideoUpload] = useState(null);
     const [mobileImgUpload, setMobileImgUpload] = useState(null);
     const [webImgUpload, setWebImgUpload] = useState(null);
-    const [loadingUpload, setLoadingUpload] = useState(false);
 
     const selectVideo = (e: any) => {
         let selected = e.target.files[0];
@@ -122,7 +119,6 @@ const UploadPage = () => {
 
     const uploadFilmContent = () => {
         setIsUploading(true);
-        setLoadingUpload(true);
         if (videoUpload == null) return;
         if (mobileImgUpload == null) return;
         if (webImgUpload == null) return;
@@ -204,7 +200,6 @@ const UploadPage = () => {
 
     const createFilm = () => {
         //#region Check Valid
-        setLoading(true);
         const listGenres: any = [];
         genreSelects.map((id) => {
             listGenres.push({id: id});
@@ -267,12 +262,10 @@ const UploadPage = () => {
         })
             .then(() => {
                 clean();
-                setLoading(false);
                 enqueueSnackbar("Add Film Success", {variant: "success"});
                 navigate("/films");
             })
             .catch((err) => {
-                setLoading(false);
                 enqueueSnackbar("Add Film Faild", {variant: "error"});
                 console.error(err);
             });
@@ -288,7 +281,7 @@ const UploadPage = () => {
         setName("");
         setProducer("");
         setAge("");
-        setDesribe("");
+        setDescribe("");
         setLength(0);
         setGenreSelects([]);
         setPersonSelects([]);
@@ -358,34 +351,14 @@ const UploadPage = () => {
                     id="outlined-number"
                     label="Lenght (minutes)"
                     type="number"
-                    onChange={onChangeLenght}
+                    onChange={onChangeLength}
                     InputLabelProps={{
                         shrink: true,
                     }}
                 />
             </div>
-            <div className="dp-flex">
-                <div
-                    style={{
-                        flex: 1,
-                    }}
-                >
-                    <IconButton>
-                        <AddIcon color="error" fontSize="medium"/>
-                    </IconButton>
-                </div>
-                <div
-                    style={{
-                        textAlign: "end",
-                    }}
-                >
-                    <IconButton>
-                        <AddIcon color="error" fontSize="medium"/>
-                    </IconButton>
-                </div>
-            </div>
-            <div className="flex-wrap" style={{justifyContent: 'center'}}>
-                <div style={{height: 300, width: 600, margin: 4}}>
+            <div style={{justifyContent: 'center', display: 'flex'}}>
+                <div style={{height: 400, width: "50%", margin: 4}}>
                     <DataGrid
                         onSelectionModelChange={(itm) => {
                             setGenreSelects(itm);
@@ -397,7 +370,7 @@ const UploadPage = () => {
                         checkboxSelection
                     />
                 </div>
-                <div style={{height: 300, width: 600, margin: 4}}>
+                <div style={{height: 400, width: "50%", margin: 4}}>
                     <DataGrid
                         onSelectionModelChange={(itm) => {
                             setPersonSelects(itm);
@@ -444,6 +417,7 @@ const UploadPage = () => {
                 <Box margin={2} flex={0}>
                     {webImgUpload != null ? (
                         <img
+                            alt={""}
                             style={{
                                 marginRight: 20,
                                 height: 200,
@@ -458,6 +432,7 @@ const UploadPage = () => {
                 <Box margin={2} flex={0}>
                     {mobileImgUpload != null ? (
                         <img
+                            alt={""}
                             style={{
                                 marginRight: 20,
                                 height: 200,

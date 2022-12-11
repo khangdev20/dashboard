@@ -2,7 +2,7 @@ import React, {useState, useCallback, useEffect, useRef} from "react";
 import {CustomSpeedDial} from "../components/Button/CustomSpeedDial";
 import {styles as modalTheme} from "../../src/containts";
 import CustomInput from "../components/Input/CustomInput";
-import {Box, Modal, Typography, LinearProgress, IconButton} from "@mui/material";
+import {Box, Modal, Typography, LinearProgress, IconButton, Button, TextField} from "@mui/material";
 import CustomButton from "../components/Button/CustomButton";
 import {GenreEntity} from "../models/GenreEntity";
 import {useApi} from "../hooks/useApi";
@@ -12,9 +12,13 @@ import {CustomCard} from "../components/Card/CustomCard";
 import {ConfirmDialog} from "../components/Dialog/ConfirmDialog";
 import "./index.css";
 import {SubHeader} from "../components/Header/SubHeader";
-import {DataGrid, GridColDef} from "@mui/x-data-grid";
+import {DataGrid, GridColDef, GridRowId} from "@mui/x-data-grid";
 import {useNavigate} from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import {AddCircle} from "@mui/icons-material";
+import ButtonOutlined from "../components/Button/ButtonOutlined";
+import {FilmEntity} from "../models/FilmEnity";
 
 export default function GenresPage() {
     const {enqueueSnackbar} = useSnackbar();
@@ -23,6 +27,9 @@ export default function GenresPage() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<GenreEntity[]>([]);
     const [name, setName] = useState("");
+    const [openModalAddGenreToFilm, setOpenModalAddGenreToFilm] = useState(false);
+    const [genresSelects, setGenresSelects] = useState<GridRowId[]>([]);
+    const [films, setFilms] = useState<FilmEntity[]>([]);
     const {callApi} = useApi();
 
     const navigate = useNavigate();
@@ -30,7 +37,20 @@ export default function GenresPage() {
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
 
-    const idGenre = useRef("");
+    const handleOpenGenreToFilm = () => {
+        getFilms();
+        setOpenModalAddGenreToFilm(true);
+    }
+    const handleCloseGenreToFilm = () => {
+        setOpenModalAddGenreToFilm(false);
+    }
+
+    const handleOpendialog = () => {
+        if (genresSelects.length === 0) return enqueueSnackbar("Please choose genre!", {variant: 'warning'})
+        if (genresSelects.length > 1) return enqueueSnackbar("Please choose one genre!", {variant: 'warning'})
+        setOpenDialog(true);
+    }
+
 
     const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
@@ -51,6 +71,18 @@ export default function GenresPage() {
                 console.error(err);
             });
     };
+    const getFilms = useCallback(() => {
+        setLoading(true);
+        console.log('films')
+        callApi<FilmEntity[]>(REQUEST_TYPE.GET, "api/films")
+            .then((res) => {
+                setLoading(false);
+                setFilms(res.data);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }, [callApi]);
 
     const getGenres = useCallback(() => {
         setLoading(true);
@@ -65,12 +97,17 @@ export default function GenresPage() {
             });
     }, [callApi]);
 
-    const deleteGenre = (id: string) => {
+    useEffect(() => {
+        return () => {
+            getGenres();
+        }
+    }, [getGenres]);
+
+    const deleteGenre = (id: any) => {
         setOpenDialog(true);
         callApi(REQUEST_TYPE.DELETE, `api/genres/${id}`)
             .then(() => {
                 setOpenDialog(false);
-                idGenre.current = "";
                 getGenres();
                 enqueueSnackbar("Delete Genre Success!", {variant: "success"});
             })
@@ -81,30 +118,25 @@ export default function GenresPage() {
             });
     };
 
-    useEffect(() => {
-        getGenres();
-    }, [getGenres]);
     const columnGenres: GridColDef[] = [
-        {field: "name", headerName: "Genre Name", width: 250},
+        {
+            field: "name",
+            renderHeader: () => <Typography className="style-header-grid">Genre Name</Typography>,
+            width: 250
+        },
     ];
 
+    const columnFilms: GridColDef[] = [
+        {
+            field: "name",
+            renderHeader: () => <Typography className="style-header-grid">Film Name</Typography>,
+            width: 250
+        },
+    ];
 
     return (
         <Box>
             {loading ? <LinearProgress color="secondary"/> : ""}
-            <SubHeader addButton={handleOpenModal}/>
-            {/*<Box className="flex-wrap">*/}
-            {/*    {data.map((value, key) => (*/}
-            {/*        <CustomCard*/}
-            {/*            key={key}*/}
-            {/*            name={value.name}*/}
-            {/*            handleDelete={() => {*/}
-            {/*                setOpenDialog(true);*/}
-            {/*                idGenre.current = value.id;*/}
-            {/*            }}*/}
-            {/*        />*/}
-            {/*    ))}*/}
-            {/*</Box>*/}
             <Box sx={{
                 width: '100%',
                 height: 500,
@@ -115,34 +147,76 @@ export default function GenresPage() {
                 <DataGrid
                     rows={data}
                     columns={columnGenres}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
-                    onCellClick={(itm) => {
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
+                    onCellDoubleClick={(itm) => {
                         navigate(`${itm.id}`)
                     }}
+                    onSelectionModelChange={(itm) => setGenresSelects(itm)}
+                    checkboxSelection
                 />
+            </Box>
+            <Box padding={1}>
+                <ButtonOutlined color={'success'} onClick={handleOpenModal}>
+                    ADD NEW GENRE
+                    <AddIcon fontSize={'small'}/>
+                </ButtonOutlined>
+                <ButtonOutlined color={'info'} onClick={handleOpenGenreToFilm}>
+                    ADD GENRE TO FILM
+                    <AddCircle fontSize={'small'}/>
+                </ButtonOutlined>
+                <ButtonOutlined color={'error'} onClick={handleOpendialog}>
+                    DELETE GENRE IS SELECTED
+                    <DeleteIcon fontSize={'small'}/>
+                </ButtonOutlined>
             </Box>
             <ConfirmDialog
                 open={openDialog}
                 title="Do you really want to delete it?"
                 handleCancel={() => setOpenDialog(false)}
-                handleOk={() => deleteGenre(idGenre.current)}
+                handleOk={() => deleteGenre(genresSelects[0])}
             />
+            <Modal open={openModalAddGenreToFilm} onClose={handleCloseGenreToFilm}>
+                <Box sx={modalTheme}>
+                    <Typography margin={1} fontWeight={'bold'}>ADD GENRE TO FILM</Typography>
+                    <Box width={340}>
+                        <DataGrid
+                            checkboxSelection
+                            rowsPerPageOptions={[5]}
+                            columns={columnFilms}
+                            rows={films}
+                            autoHeight={true}/>
+
+                    </Box>
+                    <Box>
+                        <ButtonOutlined color={'error'}>
+                            SUBMIT
+                        </ButtonOutlined>
+                        <ButtonOutlined>
+                            CANCEL
+                        </ButtonOutlined>
+                    </Box>
+                </Box>
+            </Modal>
             <Modal open={openModal} onClose={handleCloseModal}>
                 <Box sx={modalTheme}>
-                    <Typography>ADD GENRES</Typography>
-                    <CustomInput
-                        placeholder="Genres"
-                        label="Genres"
-                        value={name}
-                        onChange={onChangeName}
-                    />
-                    <CustomButton color="error" text="SUBMIT" onClick={createGenres}/>
-                    <CustomButton
-                        color="inherit"
-                        text="CLOSE"
-                        onClick={handleCloseModal}
-                    />
+                    <Box display={'flex'} flexDirection={'column'} alignItems={'center'} width={400}>
+                        <Typography>ADD GENRES</Typography>
+                        <TextField
+                            fullWidth
+                            margin={'normal'}
+                            placeholder="Genres"
+                            label="Genres"
+                            value={name}
+                            onChange={onChangeName}
+                        />
+                        <CustomButton color="error" text="SUBMIT" onClick={createGenres}/>
+                        <CustomButton
+                            color="inherit"
+                            text="CLOSE"
+                            onClick={handleCloseModal}
+                        />
+                    </Box>
                 </Box>
             </Modal>
         </Box>

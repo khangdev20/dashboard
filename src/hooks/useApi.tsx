@@ -22,17 +22,19 @@ export const useApi = () => {
             switch (requestType) {
                 case REQUEST_TYPE.GET:
                     response = await HTTP_CLIENT.get<T>(`${endpoint}`, {
-                        headers: {Authorization: bearer},
+                        headers: {
+                            Authorization: bearer
+                        }
                     });
                     break;
                 case REQUEST_TYPE.POST:
                     response = await HTTP_CLIENT.post<T>(`${endpoint}`, params, {
-                        headers: {Authorization: bearer},
+                        headers: {Authorization: bearer}
                     });
                     break;
                 case REQUEST_TYPE.PUT:
                     response = await HTTP_CLIENT.put<T>(`${endpoint}`, params, {
-                        headers: {Authorization: bearer},
+                        headers: {Authorization: bearer}
                     });
                     break;
                 case REQUEST_TYPE.DELETE:

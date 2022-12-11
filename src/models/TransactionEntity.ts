@@ -7,5 +7,6 @@ export interface TransactionEntity {
   wallet: WalletEntity;
   price: number,
   time: number,
+  status: boolean,
   created: Date,
 }

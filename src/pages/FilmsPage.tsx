@@ -44,7 +44,6 @@ import StopIcon from "@mui/icons-material/Stop";
 
 export default function FilmsPage() {
     //#region State
-    const [resultSearchFilms, setSetResultFilms] = useState<FilmEntity[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
     const {enqueueSnackbar} = useSnackbar();
     const [films, setFilms] = useState<FilmEntity[]>([]);
@@ -57,6 +56,7 @@ export default function FilmsPage() {
     //#region Call Api
     const getFilms = useCallback(() => {
         setLoading(true);
+        console.log('films')
         callApi<FilmEntity[]>(REQUEST_TYPE.GET, "api/films")
             .then((res) => {
                 setLoading(false);
@@ -66,23 +66,12 @@ export default function FilmsPage() {
                 console.error(err);
             });
     }, [callApi]);
-    useEffect(() => {
-        getFilms();
-    }, [getFilms]);
 
-    const getFilmsByName = (keyName: string) => {
-        callApi<FilmEntity[]>(
-            REQUEST_TYPE.GET,
-            `api/films/search?keyName=${keyName}`
-        )
-            .then((res) => {
-                setSetResultFilms(res.data);
-                console.log(res.data);
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    };
+    useEffect(() => {
+        return () => {
+            getFilms()
+        };
+    }, [getFilms]);
 
     const deleteFilm = (id: string) => {
         setLoading(true);
@@ -105,6 +94,7 @@ export default function FilmsPage() {
         <Box display={'flex'} >
             {films.map((value, key) => (
                 <CardFilm
+                    title={value.name}
                     key={key}
                     premium={value.premium}
                     src={value.mobileUrl}
@@ -120,14 +110,14 @@ export default function FilmsPage() {
     //#endregion
 
     return (
-        <Box >
+        <Box>
             {loading ? <LinearProgress color="secondary"/> : ""}
-            {/*<SubHeader*/}
-            {/*    value={keyName}*/}
-            {/*    addButton={() => navigate("/films/upload")}*/}
-            {/*    refreshButton={() => getFilms()}*/}
-            {/*/>*/}
-            <Box>
+            <SubHeader
+                value={keyName}
+                addButton={() => navigate("/films/upload")}
+                refreshButton={() => getFilms()}
+            />
+            <Box overflow={"auto"} >
                 {RenderFilms}
             </Box>
             <ConfirmDialog
@@ -138,7 +128,7 @@ export default function FilmsPage() {
                 }}
                 handleOk={() => {
                     if (film === undefined) {
-                        enqueueSnackbar("FILM UNDIFINED", {variant: "error"});
+                        enqueueSnackbar("FILM UNDEFINED", {variant: "error"});
                     } else {
                         deleteObjectFirebase(film.videoUrl);
                         deleteObjectFirebase(film.mobileUrl);

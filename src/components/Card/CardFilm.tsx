@@ -1,15 +1,16 @@
 import {
     Card, CardMedia,
 } from "@mui/material";
-import {PremiumTag} from "../Tag/PremiumTag";
 
 export const CardFilm = ({
                              src,
                              onClick,
+                             title,
                              premium,
                          }: any) => {
     return (
         <Card
+            title={title}
             onClick={onClick}
             sx={{
                 boxShadow: 5,
@@ -20,11 +21,10 @@ export const CardFilm = ({
                     boxShadow: 20,
                     cursor: "pointer",
                 },
-                minWidth: 200,
-                maxWidth: 200
+                width: 200,
+                height: 300
             }}
         >
-
             <CardMedia
                 component={"img"}
                 image={src}
