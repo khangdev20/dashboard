@@ -13,7 +13,6 @@ const DetailProducer = () => {
 
     const {producerId} = useParams();
     const {callApi} = useApi();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const getProducer = () => {
         callApi<ProducerEntity>(REQUEST_TYPE.GET, `api/producers/${producerId}`).then((res) => {
             setProducer(res.data)
@@ -26,7 +25,7 @@ const DetailProducer = () => {
         return () => {
             getProducer();
         };
-    }, []);
+    }, [getProducer]);
 
 
     return (

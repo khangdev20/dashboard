@@ -18,6 +18,7 @@ import RankingPage from "../pages/RankingPage";
 import DetailProducer from "../pages/detail/DetailProducer";
 import EditUser from "../pages/edit/EditUser";
 import DetailSales from "../pages/detail/DetailSales";
+import DetailGenre from "../pages/detail/DetailGenre";
 
 export const publicRoutes = [
   {path: '/dashboard', component: DashboardPage},
@@ -39,6 +40,8 @@ export const publicRoutes = [
   {path: '/rankings', component: RankingPage },
   {path: '/users/edit/:userId', component: EditUser },
   {path: '/sales/:salesId', component: DetailSales },
+  {path: '/producers/:producerId', component: DetailProducer },
+  {path: '/genres/:genreId', component: DetailGenre },
 ]
 
 

@@ -4,16 +4,14 @@ import {
     Rating,
     Button,
     IconButton,
-    TextField, Popper, Paper, Menu, Grid, Card, CardMedia,
+    TextField, Card, CardMedia,
 } from "@mui/material";
-import React, {useCallback, useEffect, useRef, useState} from "react";
-
+import React, {useCallback, useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {REQUEST_TYPE} from "../../Enums/RequestType";
 import {FilmEntity} from "../../models/FilmEnity";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
-import Fab from '@mui/material/Fab';
 import "../index.css";
 import {useApi} from "../../hooks/useApi";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -23,14 +21,12 @@ import CardComment from "../../components/Card/CardComment";
 import ListContainer from "../../components/List/ListContainer";
 import CardItem from "../../components/Card/CardItem";
 import BoxContainer from "../../components/Box/BoxContainer";
-import ButtonEdit from "../../components/Button/ButtonEdit";
-import {
-    HubConnection,
-} from "@microsoft/signalr";
-import AddIcon from "@mui/icons-material/Add";
 import {GenreEntity} from "../../models/GenreEntity";
-import {PersonEntity} from "../../models/PersonEntity";
-import {DataGrid, GridColDef} from "@mui/x-data-grid";
+import {GridColDef} from "@mui/x-data-grid";
+import ButtonOutlined from "../../components/Button/ButtonOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {deleteObjectFirebase} from "../../firebase/deleteObject";
+import {ConfirmDialog} from "../../components/Dialog/ConfirmDialog";
 
 export const DetailFilm = () => {
     const {filmId} = useParams();
@@ -39,28 +35,25 @@ export const DetailFilm = () => {
     const [comment, setComment] = useState("");
     const [replaceVideoPoster, setReplaceVideoPoster] = useState(false);
     const {enqueueSnackbar} = useSnackbar();
-    // const [hubConnection, setHubConnection] = useState<HubConnection>();
     const {callApi} = useApi();
     const navigate = useNavigate();
-    const [editDes, setEditDes] = useState(true);
-    const [editName, setEditName] = useState(true);
     const [describe, setDescribe] = useState("");
     const [name, setName] = useState("");
-    const [genres, setGenres] = useState<GenreEntity[]>([]);
-    const [persons, setPersons] = useState<PersonEntity[]>([]);
-    const [openAddPerson, setOpenAddPerson] = useState(false);
+    // const [genres, setGenres] = useState<GenreEntity[]>([]);
+    const [loading, setLoading] = useState(false)
+    const [openDialog, setOpenDialog] = useState(false);
 
     // const [edit, setEdit] = useState(false);
 
     const getFilmById = useCallback(
-        (id: string) => {
-            callApi<FilmEntity>(REQUEST_TYPE.GET, `api/films/f?id=${id}`)
+        () => {
+            callApi<FilmEntity>(REQUEST_TYPE.GET, `api/films/f?id=${filmId}`)
                 .then((res) => {
                     setFilm(res.data);
                     let sum = 0;
                     let totalComment = 0;
                     for (const a of res.data.ratings) {
-                        if (a.user.role == "User") {
+                        if (a.user.role === "User") {
                             sum += a.point;
                             totalComment = totalComment + 1;
                         }
@@ -74,30 +67,30 @@ export const DetailFilm = () => {
                     console.error(err);
                 });
         },
-        [callApi]
+        [callApi, filmId]
     );
 
-    const getGenres = () => {
-        callApi<GenreEntity[]>(REQUEST_TYPE.GET, "api/genres")
-            .then((res) => {
-                setGenres(res.data);
-            }).catch((err) => {
-            console.error(err)
-        })
-    }
-    const getPersons = () => {
-        callApi<PersonEntity[]>(REQUEST_TYPE.GET, "api/persons")
-            .then((res) => {
-                setPersons(res.data);
-            }).catch((err) => {
-            console.error(err)
-        })
-    }
+    // const getGenres = () => {
+    //     callApi<GenreEntity[]>(REQUEST_TYPE.GET, "api/genres")
+    //         .then((res) => {
+    //             setGenres(res.data);
+    //         }).catch((err) => {
+    //         console.error(err)
+    //     })
+    // }
+    // const getPersons = () => {
+    //     callApi<PersonEntity[]>(REQUEST_TYPE.GET, "api/persons")
+    //         .then((res) => {
+    //             setPersons(res.data);
+    //         }).catch((err) => {
+    //         console.error(err)
+    //     })
+    // }
 
     const deletePerson = (id: string) => {
         callApi(REQUEST_TYPE.DELETE, `api/persons/film/${id}`)
             .then(() => {
-                getFilmById(filmId!);
+                getFilmById();
             })
             .catch((err) => {
                 console.error(err);
@@ -107,7 +100,7 @@ export const DetailFilm = () => {
     const deleteGenre = (id: string) => {
         callApi(REQUEST_TYPE.DELETE, `api/genres/film/${id}`)
             .then(() => {
-                getFilmById(filmId!);
+                getFilmById();
             })
             .catch((err) => {
                 console.error(err);
@@ -124,8 +117,24 @@ export const DetailFilm = () => {
     //     console.log(e);
     //   }
     // };
+
+    const deleteFilm = () => {
+        setLoading(true);
+        callApi(REQUEST_TYPE.DELETE, `api/films/${filmId}`)
+            .then(() => {
+                setLoading(false);
+                setOpenDialog(false);
+                enqueueSnackbar("Delete Film Success", {variant: "success"});
+                navigate("../films")
+            })
+            .catch((err) => {
+                setLoading(false);
+                enqueueSnackbar("Delete Film Failed", {variant: "error"});
+                console.error(err);
+            });
+    };
     const sendComment = () => {
-        if (comment == "")
+        if (comment === "")
             return enqueueSnackbar("Nhập hộ cái chữ vào bạn iê???😐😐", {
                 variant: "warning",
             });
@@ -135,7 +144,7 @@ export const DetailFilm = () => {
             point: 5,
         })
             .then(() => {
-                getFilmById(filmId!);
+                getFilmById();
                 setComment("");
                 enqueueSnackbar("SEND COMMENT", {variant: "success"});
             })
@@ -149,7 +158,7 @@ export const DetailFilm = () => {
         callApi(REQUEST_TYPE.DELETE, `/api/rating/${id}`)
             .then(() => {
                 enqueueSnackbar("DELETE RATING SUCCESS!", {variant: "success"});
-                getFilmById(filmId!);
+                getFilmById();
             })
             .catch(() => {
                 enqueueSnackbar("DELETE RATING FAILD!", {variant: "error"});
@@ -157,21 +166,22 @@ export const DetailFilm = () => {
     };
 
     useEffect(() => {
-        getFilmById(filmId!);
+        getFilmById();
         // createHubConnection();
-    }, []);
+    }, [getFilmById]);
 
-    const columnsPersons: GridColDef[] = [
-        {field: "name", headerName: "Name Person", width: 120},
-        {field: "created", headerName: "Created", width: 250},
-    ];
-    const columGenres: GridColDef[] = [
-        {field: "name", headerName: "Name Genres", width: 120},
-        {field: "created", headerName: "Created", width: 250},
-    ];
+    // const columnsPersons: GridColDef[] = [
+    //     {field: "name", headerName: "Name Person", width: 120},
+    //     {field: "created", headerName: "Created", width: 250},
+    // ];
+    // const columGenres: GridColDef[] = [
+    //     {field: "name", headerName: "Name Genres", width: 120},
+    //     {field: "created", headerName: "Created", width: 250},
+    // ];
 
     return (
-        <Box  flexDirection={"column"} padding={2}>
+        <Box flexDirection={"column"} padding={2}>
+
             <Box display={"flex"} justifyContent={'center'}>
                 {replaceVideoPoster ? (
                     <Card
@@ -180,7 +190,7 @@ export const DetailFilm = () => {
                                 cursor: "pointer",
                             },
                             maxHeight: 500,
-                            maxWidth:1000,
+                            maxWidth: 1000,
                             justifyContent: 'center',
                             display: 'flex'
                         }}
@@ -197,7 +207,7 @@ export const DetailFilm = () => {
                                 cursor: "pointer",
                             },
                             maxHeight: 500,
-                            maxWidth:1000,
+                            maxWidth: 1000,
                             justifyContent: 'center',
                             display: 'flex'
                         }}
@@ -211,7 +221,7 @@ export const DetailFilm = () => {
             </Box>
             <Box>
                 <Box className={'flex-wrap'}>
-                    <Box >
+                    <Box>
                         <Box p={2}>
                             <Typography
                                 fontSize={20}
@@ -249,19 +259,10 @@ export const DetailFilm = () => {
                                 value={avgPoint}
                             />
                         </Box>
-                        {/*<Typography fontSize={20} color={"green"} fontWeight={"bold"}>*/}
-                        {/*    {((avgPoint / 5) * 100).toFixed(1)}%*/}
-                        {/*</Typography>*/}
                     </Box>
                 </Box>
                 <Box display={"flex"} alignItems={"center"}>
-                    <TextField
-                        disabled={editDes}
-                        value={describe}
-                        multiline
-                        onChange={(e) => setDescribe(e.target.value)}
-                        fullWidth
-                    />
+                    <Typography>{film?.describe}</Typography>
                 </Box>
                 <Box className="dp-flex">
                     <VisibilityIcon color="disabled"/>
@@ -335,6 +336,26 @@ export const DetailFilm = () => {
                     </BoxContainer>
                 </Box>
             </Box>
+            <ConfirmDialog
+                open={openDialog}
+                title="Do you really want to delete it?"
+                handleCancel={() => {
+                    setOpenDialog(false);
+                }}
+                handleOk={() => {
+                    if (film === undefined) {
+                        enqueueSnackbar("FILM UNDEFINED", {variant: "error"});
+                    } else {
+                        deleteObjectFirebase(film.videoUrl);
+                        deleteObjectFirebase(film.mobileUrl);
+                        deleteObjectFirebase(film.webUrl);
+                        deleteFilm();
+                    }
+                }}
+            />
+            <Button onClick={() => setOpenDialog(true)} title={"delete"} color={'error'} fullWidth variant={'outlined'}>
+                <DeleteIcon/>
+            </Button>
         </Box>
     );
 };

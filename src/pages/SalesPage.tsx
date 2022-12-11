@@ -40,6 +40,7 @@ export default function SalesPage() {
             })
     }
 
+
     useEffect(() => {
         return () => {
             getSales()

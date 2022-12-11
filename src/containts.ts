@@ -1,4 +1,4 @@
-export const baseUrl = "http://192.168.137.1:5043";
+export const baseUrl = "http://192.168.1.192:5043";
 export const styles = {
     position: "absolute" as "absolute",
     top: "50%",

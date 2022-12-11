@@ -10,6 +10,8 @@ const DetailSales = () => {
 
     const {callApi} = useApi();
     const [sales, setSales] = useState<SalesEntity>();
+    const [total, setTotal] = useState(0);
+
 
     const {salesId} = useParams();
 
@@ -18,12 +20,24 @@ const DetailSales = () => {
             callApi<SalesEntity>(REQUEST_TYPE.GET, `api/sales/${salesId}`)
                 .then((res) => {
                     setSales(res.data);
+                    let total = 0;
+                    res.data.transactions.map((value) => {
+                        if (value.status)
+                            total+=value.price;
+                    })
+                    setTotal(total);
                 }).catch((err) => {
                 console.error(err);
             })
         },
         [callApi, salesId],
     );
+
+    const mo = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    }).format(total);
+
     useEffect(() => {
         return () => {
             getSalesId();
@@ -58,7 +72,7 @@ const DetailSales = () => {
         <Box>
             <Typography fontSize={30} fontWeight={'bold'}>{sales?.name}</Typography>
             <Box>
-                <Typography>TOTAL: {}</Typography>
+                <Typography>TOTAL: {mo}</Typography>
             </Box>
             <Box height={500}>
                 <DataGrid

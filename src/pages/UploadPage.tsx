@@ -275,7 +275,7 @@ const UploadPage = () => {
         getPersons();
         getGenres();
         getProducers();
-    }, []);
+    }, [getGenres, getPersons, getProducers]);
 
     const clean = () => {
         setName("");

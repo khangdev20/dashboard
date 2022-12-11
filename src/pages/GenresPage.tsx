@@ -1,17 +1,13 @@
-import React, {useState, useCallback, useEffect, useRef} from "react";
-import {CustomSpeedDial} from "../components/Button/CustomSpeedDial";
+import React, {useState, useCallback, useEffect} from "react";
 import {styles as modalTheme} from "../../src/containts";
-import CustomInput from "../components/Input/CustomInput";
-import {Box, Modal, Typography, LinearProgress, IconButton, Button, TextField} from "@mui/material";
+import {Box, Modal, Typography, LinearProgress, TextField} from "@mui/material";
 import CustomButton from "../components/Button/CustomButton";
 import {GenreEntity} from "../models/GenreEntity";
 import {useApi} from "../hooks/useApi";
 import {REQUEST_TYPE} from "../Enums/RequestType";
 import {useSnackbar} from "notistack";
-import {CustomCard} from "../components/Card/CustomCard";
 import {ConfirmDialog} from "../components/Dialog/ConfirmDialog";
 import "./index.css";
-import {SubHeader} from "../components/Header/SubHeader";
 import {DataGrid, GridColDef, GridRowId} from "@mui/x-data-grid";
 import {useNavigate} from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -29,6 +25,7 @@ export default function GenresPage() {
     const [name, setName] = useState("");
     const [openModalAddGenreToFilm, setOpenModalAddGenreToFilm] = useState(false);
     const [genresSelects, setGenresSelects] = useState<GridRowId[]>([]);
+    const [filmSelects, setFilmSelects] = useState<GridRowId[]>([]);
     const [films, setFilms] = useState<FilmEntity[]>([]);
     const {callApi} = useApi();
 
@@ -38,6 +35,7 @@ export default function GenresPage() {
     const handleCloseModal = () => setOpenModal(false);
 
     const handleOpenGenreToFilm = () => {
+        if (genresSelects.length === 0) return enqueueSnackbar("Please select at least one category", {variant: 'warning'});
         getFilms();
         setOpenModalAddGenreToFilm(true);
     }
@@ -46,7 +44,7 @@ export default function GenresPage() {
     }
 
     const handleOpendialog = () => {
-        if (genresSelects.length === 0) return enqueueSnackbar("Please choose genre!", {variant: 'warning'})
+        if (genresSelects.length === 0) return enqueueSnackbar("Please select a genre!", {variant: 'warning'})
         if (genresSelects.length > 1) return enqueueSnackbar("Please choose one genre!", {variant: 'warning'})
         setOpenDialog(true);
     }
@@ -118,6 +116,28 @@ export default function GenresPage() {
             });
     };
 
+    const GenresToFilm = () => {
+        const listGenres: any = [];
+        genresSelects.map((value) => {
+            listGenres.push({id: value})
+            return listGenres;
+        })
+        if (filmSelects.length > 1) return enqueueSnackbar("Please choose a film!", {variant: 'warning'})
+        if(filmSelects.length === 0) return enqueueSnackbar("Please choose a film!", {variant: 'warning'})
+        callApi(REQUEST_TYPE.POST, "api/films/genres-film", {
+            genres: listGenres,
+            filmId: filmSelects[0]
+        })
+            .then(() => {
+                enqueueSnackbar("Add Genres to film success!", {variant: 'success'})
+                setGenresSelects([]);
+                setFilmSelects([]);
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
     const columnGenres: GridColDef[] = [
         {
             field: "name",
@@ -185,14 +205,14 @@ export default function GenresPage() {
                             rowsPerPageOptions={[5]}
                             columns={columnFilms}
                             rows={films}
+                            onSelectionModelChange={(itm) => setFilmSelects(itm)}
                             autoHeight={true}/>
-
                     </Box>
                     <Box>
-                        <ButtonOutlined color={'error'}>
+                        <ButtonOutlined color={'error'} onClick={GenresToFilm}>
                             SUBMIT
                         </ButtonOutlined>
-                        <ButtonOutlined>
+                        <ButtonOutlined onClick={handleCloseGenreToFilm}>
                             CANCEL
                         </ButtonOutlined>
                     </Box>
@@ -200,23 +220,25 @@ export default function GenresPage() {
             </Modal>
             <Modal open={openModal} onClose={handleCloseModal}>
                 <Box sx={modalTheme}>
-                    <Box display={'flex'} flexDirection={'column'} alignItems={'center'} width={400}>
-                        <Typography>ADD GENRES</Typography>
-                        <TextField
-                            fullWidth
-                            margin={'normal'}
-                            placeholder="Genres"
-                            label="Genres"
-                            value={name}
-                            onChange={onChangeName}
-                        />
-                        <CustomButton color="error" text="SUBMIT" onClick={createGenres}/>
-                        <CustomButton
-                            color="inherit"
-                            text="CLOSE"
-                            onClick={handleCloseModal}
-                        />
-                    </Box>
+                    <form onSubmit={(e) => e.preventDefault()}>
+                        <Box display={'flex'} flexDirection={'column'} alignItems={'center'} width={400}>
+                            <Typography>ADD GENRES</Typography>
+                            <TextField
+                                fullWidth
+                                margin={'normal'}
+                                placeholder="Genres"
+                                label="Genres"
+                                value={name}
+                                onChange={onChangeName}
+                            />
+                            <CustomButton type={'submit'} color="error" text="SUBMIT" onClick={createGenres}/>
+                            <CustomButton
+                                color="inherit"
+                                text="CLOSE"
+                                onClick={handleCloseModal}
+                            />
+                        </Box>
+                    </form>
                 </Box>
             </Modal>
         </Box>
