@@ -89,6 +89,7 @@ export default function ProducersPage() {
         }).then(() => {
             enqueueSnackbar("DELETE SUCCESS", {variant: 'success'})
             getProducers();
+            setOpenDialog(false);
         }).catch((err) => {
             console.error(err)
             enqueueSnackbar("DELETE FAILED", {variant: 'error'})
@@ -106,17 +107,19 @@ export default function ProducersPage() {
     const handleCloseModal = () => setOpenModal(false);
     const columnProducers: GridColDef[] = [
         {
-            field: 'id',
-            renderHeader: params => <Typography className={"style-header-grid"}>Index</Typography>,
-            renderCell: (index) =>
-                index.api.getRowIndex(index.row.id) + 1,
-            filterable: false
+            field: "name",
+            renderHeader: () => <Typography className={"style-header-grid"}>Producer Name</Typography>,
+            width: 250,
+            headerAlign: 'center',
         },
         {
-            field: "name",
-            renderHeader: params => <Typography className={"style-header-grid"}>Producer Name</Typography>,
-            width: 250
-        },
+            field: 'films',
+            renderHeader: () => <Typography className={"style-header-grid"}>Films</Typography>,
+            renderCell: (index) => index.value.length ? index.value.length : '',
+            align:'center',
+            headerAlign: 'center'
+
+        }
     ];
 
     return (
@@ -125,7 +128,8 @@ export default function ProducersPage() {
                 width: '100%',
                 ":hover": {
                     cursor: 'pointer'
-                }
+                },
+                height: 600
             }}>
                 <DataGrid
                     rows={data}
@@ -147,11 +151,18 @@ export default function ProducersPage() {
                     ADD NEW PRODUCER
                     <AddToPhotosIcon fontSize={'small'}/>
                 </ButtonOutlined>
-                <ButtonOutlined color={"error"} onClick={deleteProducerSelected}>
+                <ButtonOutlined color={"error"} onClick={() => setOpenDialog(true)}>
                     DELETE PRODUCER IS SELECTED
                     <DeleteIcon fontSize={"small"}/>
                 </ButtonOutlined>
             </Box>
+
+            <ConfirmDialog
+                open={openDialog}
+                title={`Do you really want to delete ${producerSelects.length} producers?`}
+                handleOk={deleteProducerSelected}
+                handleCancel={() => setOpenDialog(false)}
+            />
 
             <Modal open={openModal} onClose={handleCloseModal}>
                 <form onSubmit={(e) => e.preventDefault()}>

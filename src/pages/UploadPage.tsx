@@ -121,7 +121,6 @@ const UploadPage = () => {
         const videoRef = ref(storage, `videos/${v4()}`);
         uploadBytes(videoRef, videoUpload)
             .then(() => {
-                setIsUploading(false);
                 getDownloadURL(videoRef).then((url) => {
                     setVideoUrl(url);
                 });
@@ -136,7 +135,6 @@ const UploadPage = () => {
         const mobileRef = ref(storage, `images/${v4()}`);
         uploadBytes(mobileRef, mobileImgUpload)
             .then(() => {
-                setIsUploading(false);
                 getDownloadURL(mobileRef).then((url) => {
                     setMobileUrl(url);
                 });
@@ -163,7 +161,7 @@ const UploadPage = () => {
             })
             .catch((err) => {
                 setIsUploading(false);
-                enqueueSnackbar("Upload Website Thumbnail Faild!", {
+                enqueueSnackbar("Upload Website Thumbnail Failed!", {
                     variant: "error",
                 });
                 console.error(err);

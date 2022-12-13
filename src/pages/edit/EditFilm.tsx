@@ -4,8 +4,8 @@ import {
     Backdrop,
     Box,
     CardMedia,
-    CircularProgress, FormControl, FormControlLabel, MenuItem,
-    Popover, RadioGroup,
+    CircularProgress, FormControl, FormControlLabel, Icon, IconButton, MenuItem,
+    Popover, RadioGroup, Switch,
     TextareaAutosize, TextField,
     Typography
 } from "@mui/material";
@@ -15,6 +15,7 @@ import {FilmEntity} from "../../models/FilmEnity";
 import ButtonOutlined from "../../components/Button/ButtonOutlined";
 import {useSnackbar} from "notistack";
 import Radio from "@mui/material/Radio";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const EditFilm = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const EditFilm = () => {
     const {callApi} = useApi();
     const [name, setName] = useState("");
     const [describe, setDescribe] = useState("");
-    const [premium, setPremium] = useState(false);
+    const [premium, setPremium] = useState(film?.premium);
     const [loading, setLoading] = useState(false);
     const [age, setAge] = useState("");
     const [mobileUrl, setMobileUrl] = useState("");
@@ -40,7 +41,6 @@ const EditFilm = () => {
     const handleSelectAge = (event: any) => {
         setAge(event.target.value);
     };
-
 
     const getFilmId = useCallback(
         () => {
@@ -69,11 +69,9 @@ const EditFilm = () => {
     };
     console.log(premium)
 
-    // const uploadMobile = () => {
-    //     // noinspection JSVoidFunctionReturnValueUsed
-    //     const url = UploadImage(mobileImgUpload);
-    //     console.log(url);
-    // }
+    const replaceWebUrl = () => {
+
+    }
 
     const setDataFilm = (film: FilmEntity) => {
         setName(film.name);
@@ -230,13 +228,12 @@ const EditFilm = () => {
                 anchorEl={anchorUploadMobile}
                 onClose={handleCloseUploadAvt}
             >
-                <Box pl={1} pr={1} display={'flex'} alignItems={'center'} justifyContent={'center'}>
+                <Box p={2} pr={1} display={'flex'} alignItems={'center'} justifyContent={'center'}>
                     <input type={'file'} accept={"image/*"} onChange={(e: any) => selectMobileImg(e)}/>
+                    <IconButton>
+                        <DeleteIcon color={'error'}/>
+                    </IconButton>
                 </Box>
-                <Backdrop
-                    open={loading}>
-                    <CircularProgress color="error"/>
-                </Backdrop>
             </Popover>
             <Popover
                 anchorOrigin={{
@@ -247,37 +244,40 @@ const EditFilm = () => {
                 anchorEl={anchorUploadWeb}
                 onClose={handleCloseUploadWeb}
             >
-                <Box pl={1} pr={1} display={'flex'} alignItems={'center'} justifyContent={'center'}>
+                <Box p={2} pr={1} display={'flex'} alignItems={'center'} justifyContent={'center'}>
                     <input type={'file'} accept={"image/*"} onChange={(e: any) => selectWebImg(e)}/>
+                    <IconButton>
+                        <DeleteIcon color={'error'}/>
+                    </IconButton>
                 </Box>
-                <Backdrop
-                    open={false}>
-                    <CircularProgress color="error"/>
-                </Backdrop>
+                {/*<Backdrop*/}
+                {/*    open={false}>*/}
+                {/*    <CircularProgress color="error"/>*/}
+                {/*</Backdrop>*/}
+
             </Popover>
             <Box display={'flex'} alignItems={'center'}>
-                <FormControl>
-                    <RadioGroup
-                        aria-labelledby="demo-radio-buttons-group-label"
-                        defaultValue={premium ? "premium" : "normal"}
-                        name="radio-buttons-group"
-                    >
-                        <Box>
-                            <FormControlLabel
-                                value="premium"
-                                control={<Radio color="error"/>}
-                                label="Premium"
-                                onClick={() => setPremium(true)}
-                            />
-                            <FormControlLabel
-                                value="normal"
-                                control={<Radio color="error"/>}
-                                label="Normal"
-                                onClick={() => setPremium(false)}
-                            />
-                        </Box>
-                    </RadioGroup>
-                </FormControl>
+                {/*<FormControl>*/}
+                {/*    <RadioGroup*/}
+                {/*        aria-labelledby="demo-radio-buttons-group-label"*/}
+                {/*        name="radio-buttons-group"*/}
+                {/*        defaultValue={film?.premium ? "premium" : "normal"}*/}
+                {/*    >*/}
+                {/*        <FormControlLabel*/}
+                {/*            value="premium"*/}
+                {/*            control={<Radio color="error"/>}*/}
+                {/*            label="Premium"*/}
+                {/*            onClick={() => setPremium(true)}*/}
+                {/*        />*/}
+                {/*        <FormControlLabel*/}
+                {/*            value="normal"*/}
+                {/*            control={<Radio color="error"/>}*/}
+                {/*            label="Normal"*/}
+                {/*            onClick={() => setPremium(false)}*/}
+                {/*        />*/}
+                {/*    </RadioGroup>*/}
+                {/*</FormControl>*/}
+                <FormControlLabel control={<Switch defaultChecked/>} label={"premium"}/>
                 <ButtonOutlined color={'error'} onClick={updateFilm}>
                     SUBMIT
                 </ButtonOutlined>

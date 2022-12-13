@@ -19,20 +19,16 @@ import CheckIcon from '@mui/icons-material/Check';
 import ButtonOutlined from "../components/Button/ButtonOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {DoneAll} from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 //#endregion
 
 export default function FilmsPage() {
     //#region State
-    const [openDialog, setOpenDialog] = useState(false);
     const {enqueueSnackbar} = useSnackbar();
     const [films, setFilms] = useState<FilmEntity[]>([]);
-    const [film, setFilm] = useState<FilmEntity>();
     const [loading, setLoading] = useState(false);
     const [filmSelects, setFilmSelects] = useState<GridRowId[]>([]);
-    const [keyName, setKeyName] = useState("");
     const navigate = useNavigate();
     const {callApi} = useApi();
 
@@ -103,7 +99,7 @@ export default function FilmsPage() {
             align: 'center'
         }
     ]
-
+    console.log(films)
     return (
         <Box>
             {loading ? <LinearProgress color="secondary"/> : ""}
@@ -111,7 +107,7 @@ export default function FilmsPage() {
                 ":hover": {
                     cursor: 'pointer'
                 },
-                height:500
+                height: 500
             }}>
                 <DataGrid
                     onCellDoubleClick={(itm) => navigate(`${itm.id}`)}

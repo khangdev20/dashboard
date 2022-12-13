@@ -35,6 +35,7 @@ const DetailProducer = () => {
             <Box display={'flex'} overflow={"auto"}>
                 {producer?.films.map((value, index, array) => (
                     <CardFilm
+                        key={index}
                         src={value.mobileUrl}
                         onClick={() => navigate(`../films/${value.id}`)}
 

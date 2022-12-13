@@ -16,8 +16,8 @@ const DetailPerson = () => {
     const [films, setFilms] = useState<[]>([]);
 
     const navigate = useNavigate()
-    const getPersonId = (id: string) => {
-        callApi<PersonEntity>(REQUEST_TYPE.GET, `api/persons/${id}`)
+    const getPersonId = () => {
+        callApi<PersonEntity>(REQUEST_TYPE.GET, `api/persons/${personId}`)
             .then((res) => {
                 setPerson(res.data);
                 // eslint-disable-next-line array-callback-return
@@ -34,13 +34,9 @@ const DetailPerson = () => {
     };
     useEffect(() => {
         return () => {
-            getPersonId(personId!)
+            getPersonId()
         };
-    }, []);
-
-    const columnFilms: GridColDef[] = [
-        {field: "name", renderHeader: (params) => <Typography fontWeight={"bold"}>FILM NAME</Typography>, width: 250},
-    ];
+    }, [getPersonId]);
 
     return (
         <Box>
@@ -49,27 +45,13 @@ const DetailPerson = () => {
             <Box p={2}>
                 <Typography component={"span"}>{person?.describe}</Typography>
             </Box>
-            {/*<Box width={300} height={500} sx={{*/}
-            {/*    ":hover": {*/}
-            {/*        cursor: 'pointer'*/}
-            {/*    }*/}
-            {/*}}>*/}
-            {/*    <DataGrid*/}
-            {/*        columns={columnFilms}*/}
-            {/*        rows={films} pageSize={10}*/}
-            {/*        rowsPerPageOptions={[10]}*/}
-            {/*        onCellClick={(itm) => {*/}
-            {/*            navigate(`../films/${itm.id}`)*/}
-            {/*        }}*/}
-            {/*    />*/}
-            {/*</Box>*/}
-            <Box display={'flex'} overflow={'auto'}>
+            <Divider/>
+            <Box display={'flex'} sx={{overflowX: 'scroll'}}>
                 {person?.films.map((value, key) => (
-                    <CardFilm src={value.film.mobileUrl} premium={value.film.premium} onClick={() => navigate(`../films/${value.filmId}`)}/>
+                    <CardFilm key={key} src={value.film.mobileUrl} premium={value.film.premium}
+                              onClick={() => navigate(`../films/${value.filmId}`)}/>
                 ))}
             </Box>
-
-
         </Box>
     )
 }

@@ -142,8 +142,17 @@ export default function GenresPage() {
         {
             field: "name",
             renderHeader: () => <Typography className="style-header-grid">Genre Name</Typography>,
-            width: 250
+            width: 250,
+            headerAlign: 'center'
         },
+        {
+            field: 'films',
+            renderHeader: () => <Typography className="style-header-grid">Films</Typography>,
+            renderCell: params => params.value.length,
+            headerAlign: 'center',
+            align: 'center'
+
+        }
     ];
 
     const columnFilms: GridColDef[] = [

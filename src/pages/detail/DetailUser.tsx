@@ -13,9 +13,10 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {CardFilm} from "../../components/Card/CardFilm";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import {deleteObjectFirebase} from "../../firebase/deleteObject";
-import BoxContainer from "../../components/Box/BoxContainer";
-import ListContainer from "../../components/List/ListContainer";
-import CardItem from "../../components/Card/CardItem";
+import ButtonOutlined from "../../components/Button/ButtonOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {ConfirmDialog} from "../../components/Dialog/ConfirmDialog";
 
 const DetailUser = () => {
     const {userId} = useParams();
@@ -25,6 +26,7 @@ const DetailUser = () => {
         React.useState<HTMLButtonElement | null>(null);
     const [avatar, setAvatar] = useState(null);
     const [loadingAvt, setLoadingAvt] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     const [user, setUser] = useState<UserEntity>();
     const {enqueueSnackbar} = useSnackbar()
 
@@ -54,6 +56,31 @@ const DetailUser = () => {
         },
         [callApi, userId],
     );
+
+    const moveToEditPage = () => {
+        navigate(`../users/edit/${userId}`)
+    }
+
+    const deleteUser = (id: any) => {
+        callApi(REQUEST_TYPE.DELETE, `api/users/${id}`)
+            .then(() => {
+                enqueueSnackbar("Delete user success!", {variant: 'success'})
+                navigate("../users");
+            })
+            .catch(() => {
+                enqueueSnackbar("Delete use is failed", {variant: 'error'});
+            })
+    }
+
+    const handleDeleteUser = () => {
+        if (user?.avatar !== "")
+        {
+            deleteObjectFirebase(user?.avatar);
+            deleteUser(userId);
+            return;
+        }
+        deleteUser(userId);
+    }
 
 
     const uploadAvt = (id: string) => {
@@ -136,6 +163,18 @@ const DetailUser = () => {
                 premium={user?.premium}
                 date={user?.dateUse.toString()}
                 onChoose={handleOpenUpload}
+            />
+            <ButtonOutlined color={'warning'} onClick={moveToEditPage}>
+                <EditIcon/>
+            </ButtonOutlined>
+            <ButtonOutlined color={'error'} onClick={() => setOpenDialog(true)}>
+                <DeleteIcon/>
+            </ButtonOutlined>
+            <ConfirmDialog
+                open={openDialog}
+                title={`Delete user ${user?.name} ?`}
+                handleOk={handleDeleteUser}
+                handleCancel={() => setOpenDialog(false)}
             />
             <Popover anchorOrigin={{
                 vertical: 'bottom',

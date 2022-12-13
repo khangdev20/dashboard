@@ -16,5 +16,4 @@ export interface UserEntity {
   email: string;
   role: string,
   dateUse: Date,
-  current: string,
 }

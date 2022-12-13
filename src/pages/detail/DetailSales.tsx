@@ -11,6 +11,8 @@ const DetailSales = () => {
     const {callApi} = useApi();
     const [sales, setSales] = useState<SalesEntity>();
     const [total, setTotal] = useState(0);
+    const [totalAddFund, setTotalAddFund] = useState(0);
+
 
     const navigate = useNavigate();
 
@@ -28,6 +30,14 @@ const DetailSales = () => {
                         return total;
                     })
                     setTotal(total);
+
+                    let addFund = 0;
+                    res.data.addFunds.map((value) => {
+                        if (value.status)
+                            addFund += value.money;
+                        return total;
+                    })
+                    setTotalAddFund(addFund);
                 }).catch((err) => {
                 console.error(err);
             })
@@ -39,6 +49,10 @@ const DetailSales = () => {
         style: "currency",
         currency: "VND",
     }).format(total);
+    const moAddFund = new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    }).format(totalAddFund);
 
     useEffect(() => {
         return () => {
@@ -114,7 +128,7 @@ const DetailSales = () => {
                     }}
                 />
             </Box>
-            <Typography margin={2} fontWeight={'bold'}>TOTAL ADD FUND: {mo}</Typography>
+            <Typography margin={2} fontWeight={'bold'}>TOTAL ADD FUND: {moAddFund}</Typography>
             <Box height={500}
                  sx={{
                      ':hover': {

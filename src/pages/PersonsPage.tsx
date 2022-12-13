@@ -159,19 +159,29 @@ export default function PersonsPage() {
         {
             field: "avatar",
             renderHeader: () => <Typography className={"style-header-grid"}>Avatar</Typography>,
-            width: 200,
+            width: 100,
             renderCell: params => <Avatar src={params.value}/>
         },
         {
             field: "name",
             renderHeader: () => <Typography className={"style-header-grid"}>Person Name</Typography>,
-            width: 250
+            width: 200
         },
         {
             field: "sex",
             renderHeader: () => <Typography className={"style-header-grid"}>Sex</Typography>,
-            width: 200,
-            renderCell: params => params.value ? "Male" : "Female"
+            width: 100,
+            renderCell: params => params.value ? "Male" : "Female",
+            headerAlign: 'center',
+            align: 'center'
+        },
+        {
+            field: "films",
+            headerAlign: 'center',
+            align: 'center',
+            renderHeader: () => <Typography className={"style-header-grid"}>Films</Typography>,
+            renderCell: params => params.value.length ? params.value.length : '',
+            width: 100,
         },
         {
             field: "created",

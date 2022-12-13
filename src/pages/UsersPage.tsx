@@ -8,7 +8,7 @@ import {
     FormControl,
     FormControlLabel,
     Radio,
-    RadioGroup, Avatar,
+    RadioGroup, Avatar, Backdrop, CircularProgress,
 } from "@mui/material";
 import "./index.css";
 import React, {useCallback, useEffect, useState} from "react";
@@ -20,12 +20,9 @@ import {useApi} from "../hooks/useApi";
 import {REQUEST_TYPE} from "../Enums/RequestType";
 import {UserEntity} from "../models/UserEntity";
 import {useNavigate} from "react-router-dom";
-import {DataGrid, GridCellParams, GridColDef, GridRowId} from "@mui/x-data-grid";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import {DataGrid, GridColDef, GridRowId} from "@mui/x-data-grid";
 import ButtonOutlined from "../components/Button/ButtonOutlined";
 import {AddCircle, DoneAll, RemoveDone} from "@mui/icons-material";
-import CheckIcon from "@mui/icons-material/Check";
 import {ConfirmDialog} from "../components/Dialog/ConfirmDialog";
 import {deleteObjectFirebase} from "../firebase/deleteObject";
 
@@ -34,7 +31,6 @@ export default function UsersPage() {
 
     //#region useState
     const [openModal, setOpenModal] = useState(false);
-    const [openFormEdit, setOpenFormEdit] = useState(false);
     const [loading, setLoading] = useState(false);
     const [role, setRole] = useState("");
     const [name, setName] = useState("");
@@ -56,11 +52,6 @@ export default function UsersPage() {
         setRole(event.target.value);
     };
 
-    const handleOpenConfirm = () => {
-        getUserId(userSelects[0]);
-        if (userSelects.length === 0) return enqueueSnackbar("Please select a user!", {variant: 'warning'})
-        setOpenConfirm(true)
-    }
 
     const onChangeName = (e: any) => {
         setName(e.target.value);
@@ -169,11 +160,9 @@ export default function UsersPage() {
     }
 
     const handleDeleteUser = () => {
-        if (user?.avatar === '')
-        {
+        if (user?.avatar === '') {
             deleteUser(userSelects[0]);
-        }
-        else {
+        } else {
             deleteObjectFirebase(user?.avatar!);
             deleteUser(userSelects[0]);
         }
@@ -185,13 +174,6 @@ export default function UsersPage() {
         };
     }, [getUsers]);
 
-    const moveToEditPage = () => {
-        if (userSelects.length > 1)
-            return enqueueSnackbar("Please choose one user!", {variant: 'warning'})
-        if (userSelects.length === 0)
-            return enqueueSnackbar("You have not selected a user", {variant: 'warning'})
-        navigate(`edit/${userSelects[0]}`)
-    }
 
     const columnUsers: GridColDef[] = [
         {
@@ -215,6 +197,14 @@ export default function UsersPage() {
             width: 200
         },
         {
+            field: "wallet",
+            renderHeader: () => <Typography className={"style-header-grid"}>Money</Typography>,
+            width: 100,
+            renderCell: params => params.value.money,
+            headerAlign: 'center',
+            align: "center"
+        },
+        {
             field: "sex",
             renderHeader: () => <Typography className={"style-header-grid"}>Sex</Typography>,
             width: 100,
@@ -233,8 +223,9 @@ export default function UsersPage() {
         {
             field: "dateUse",
             renderHeader: () => <Typography className={"style-header-grid"}>Date Use</Typography>,
-            width: 100,
-            renderCell: params => params.value
+            width: 200,
+            renderCell: params => params.value,
+            headerAlign: 'center'
         },
     ];
 
@@ -243,7 +234,7 @@ export default function UsersPage() {
         <div style={{
             padding: 2
         }}>
-            {loading ? <LinearProgress color="secondary"/> : ""}
+
             <Box sx={{
                 ":hover": {
                     cursor: 'pointer'
@@ -256,7 +247,6 @@ export default function UsersPage() {
                     onCellDoubleClick={(itm) => {
                         navigate(`${itm.id}`)
                     }}
-                    checkboxSelection
                     onSelectionModelChange={(itm) => {
                         setUserSelects(itm)
                         console.log(itm)
@@ -270,20 +260,15 @@ export default function UsersPage() {
                 title={"Do you really want to delete it?"}
             />
             <Box margin={1}>
-                <ButtonOutlined color={'success'} onClick={moveToEditPage}>
-                    <EditIcon fontSize={'small'}/>
-                </ButtonOutlined>
-                <ButtonOutlined onClick={() => setOpenModal(true)}>
+                <ButtonOutlined color={'success'} onClick={() => setOpenModal(true)}>
                     <AddCircle fontSize={'small'}/>
-                </ButtonOutlined>
-                <ButtonOutlined color={'error'} onClick={handleOpenConfirm}>
-                    <DeleteIcon fontSize={'small'}/>
                 </ButtonOutlined>
             </Box>
             <Modal open={openModal} onClose={handleCloseModal}>
                 <Box sx={modalTheme}>
                     <Typography fontSize={25} fontWeight={'bold'}>ADD USER</Typography>
-                    <Box width={400}>
+                    <Box width={400} display={'flex'} flexDirection={"column"} alignItems={'center'}>
+
                         <Box className="dp-flex">
                             <CustomInput
                                 placeholder="Name"
@@ -362,65 +347,13 @@ export default function UsersPage() {
                             text="CLOSE"
                             onClick={handleCloseModal}
                         />
+                        <Backdrop open={loading}>
+                            <CircularProgress color={'error'}/>
+                        </Backdrop>
                     </Box>
                 </Box>
             </Modal>
-            <Modal open={openFormEdit} onClose={handleCloseModal}>
-                <Box sx={modalTheme}>
-                    <Typography>EDIT USER</Typography>
-                    <Box className="dp-flex">
-                        <CustomInput
-                            placeholder="Name"
-                            label="Name"
-                            value={name}
-                            onChange={onChangeName}
-                        />
-                        <CustomInput
-                            placeholder="Phone"
-                            label="Phone"
-                            value={phone}
-                            onChange={onChangePhone}
-                            disabled={true}
-                        />
-                    </Box>
-                    <CustomInput
-                        disabled={true}
-                        placeholder="Email"
-                        label="Email"
-                        value={email}
-                    />
-                    <TextField
-                        select
-                        fullWidth
-                        value={role}
-                        onChange={handleChangeTextSelect}
-                        label="Role"
-                        margin="normal"
-                    >
-                        {roles.map((option) => (
-                            <MenuItem key={option.role} value={option.role}>
-                                {option.role}
-                            </MenuItem>
-                        ))}
-                    </TextField>
 
-                    <Box
-                        sx={{
-                            display: "flex",
-                        }}
-                    >
-                        <CustomButton color="error" text="SUBMIT EDIT"/>
-                        <CustomButton
-                            color="inherit"
-                            text="CLOSE"
-                            onClick={() => {
-                                setOpenFormEdit(false);
-                                cleanUp();
-                            }}
-                        />
-                    </Box>
-                </Box>
-            </Modal>
         </div>
     );
 }
