@@ -4,7 +4,7 @@ import {
     Rating,
     Button,
     IconButton,
-    TextField, Card, CardMedia,
+    TextField, Card, CardMedia, Avatar,
 } from "@mui/material";
 import React, {useCallback, useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
@@ -22,11 +22,12 @@ import ListContainer from "../../components/List/ListContainer";
 import CardItem from "../../components/Card/CardItem";
 import BoxContainer from "../../components/Box/BoxContainer";
 import {GenreEntity} from "../../models/GenreEntity";
-import {GridColDef} from "@mui/x-data-grid";
+import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import ButtonOutlined from "../../components/Button/ButtonOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {deleteObjectFirebase} from "../../firebase/deleteObject";
 import {ConfirmDialog} from "../../components/Dialog/ConfirmDialog";
+import EditIcon from "@mui/icons-material/Edit";
 
 export const DetailFilm = () => {
     const {filmId} = useParams();
@@ -161,28 +162,49 @@ export const DetailFilm = () => {
                 getFilmById();
             })
             .catch(() => {
-                enqueueSnackbar("DELETE RATING FAILD!", {variant: "error"});
+                enqueueSnackbar("DELETE RATING FAILED!", {variant: "error"});
             });
     };
 
     useEffect(() => {
         getFilmById();
-        // createHubConnection();
     }, [getFilmById]);
 
-    // const columnsPersons: GridColDef[] = [
-    //     {field: "name", headerName: "Name Person", width: 120},
-    //     {field: "created", headerName: "Created", width: 250},
-    // ];
-    // const columGenres: GridColDef[] = [
-    //     {field: "name", headerName: "Name Genres", width: 120},
-    //     {field: "created", headerName: "Created", width: 250},
-    // ];
+    const columnsPersons: GridColDef[] = [
+        {
+            field: 'person', renderCell: params => (
+                <>
+                    <Avatar src={params.value.avatar}/>
+                    <Typography pl={1}>{params.value.name}</Typography>
+                </>
+            ),
+            renderHeader: () => <Typography className={"style-header-grid"}>Persons</Typography>,
+            width: 200
+        }
+    ];
+    const columnsGenres: GridColDef[] = [
+        {
+            field: "genre",
+            renderCell: params => params.value.name,
+            renderHeader: () => <Typography className={"style-header-grid"}>Genres</Typography>,
+            width: 120
+        }
+    ];
 
     return (
-        <Box flexDirection={"column"} padding={2}>
-
-            <Box display={"flex"} justifyContent={'center'}>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    borderRadius: 5,
+                }}>
                 {replaceVideoPoster ? (
                     <Card
                         sx={{
@@ -190,9 +212,8 @@ export const DetailFilm = () => {
                                 cursor: "pointer",
                             },
                             maxHeight: 500,
-                            maxWidth: 1000,
-                            justifyContent: 'center',
-                            display: 'flex'
+                            maxWidth: 800,
+                            flex: 1
                         }}
                     >
                         <CardMedia
@@ -207,9 +228,9 @@ export const DetailFilm = () => {
                                 cursor: "pointer",
                             },
                             maxHeight: 500,
-                            maxWidth: 1000,
+                            maxWidth: 800,
                             justifyContent: 'center',
-                            display: 'flex'
+                            flex: 1
                         }}
                     >
                         <CardMedia
@@ -218,6 +239,43 @@ export const DetailFilm = () => {
                         />
                     </Card>
                 )}
+                <BoxContainer label="Comment" quantity={film?.ratings.length}>
+                    <ListContainer>
+                        {film?.ratings.map((value, key) => (
+                            <CardComment
+                                key={key}
+                                name={value.user.name}
+                                point={value.point}
+                                comment={value.comment}
+                                role={value.user.role}
+                                created={value.created}
+                                avatar={value.user.avatar}
+                                onClick={() => deleteRating(value.id)}
+                            />
+                        ))}
+                    </ListContainer>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            pl: 2,
+                        }}
+                    >
+                        <TextField
+                            error
+                            id="standard-basic"
+                            variant="standard"
+                            placeholder="Messages?"
+                            fullWidth
+                            margin="normal"
+                            value={comment}
+                            onChange={(e: any) => setComment(e.target.value)}
+                        />
+                        <IconButton type={'submit'} onClick={sendComment}>
+                            <SendIcon color={'error'}/>
+                        </IconButton>
+                    </Box>
+                </BoxContainer>
             </Box>
             <Box>
                 <Box className={'flex-wrap'}>
@@ -261,80 +319,41 @@ export const DetailFilm = () => {
                         </Box>
                     </Box>
                 </Box>
-                <Box display={"flex"} alignItems={"center"}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: 2,
+                    background: 'rgba(103,112,106,0.14)',
+                    borderRadius: 3
+                }}>
                     <Typography>{film?.describe}</Typography>
                 </Box>
                 <Box className="dp-flex">
                     <VisibilityIcon color="disabled"/>
                     <Typography>{film?.views}</Typography>
                 </Box>
-                <Box className="flex-wrap" justifyContent={'center'}>
-                    <BoxContainer label="Comment" quantily={film?.ratings.length}>
-                        <ListContainer>
-                            {film?.ratings.map((value, key) => (
-                                <CardComment
-                                    key={key}
-                                    name={value.user.name}
-                                    point={value.point}
-                                    comment={value.comment}
-                                    role={value.user.role}
-                                    created={value.created}
-                                    avatar={value.user.avatar}
-                                    onClick={() => deleteRating(value.id)}
-                                />
-                            ))}
-                        </ListContainer>
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                pl: 2,
-                            }}
-                        >
-                            <TextField
-                                error
-                                id="standard-basic"
-                                variant="standard"
-                                placeholder="Messages?"
-                                fullWidth
-                                margin="normal"
-                                value={comment}
-                                onChange={(e: any) => setComment(e.target.value)}
-                            />
-                            <IconButton type={'submit'} onClick={sendComment}>
-                                <SendIcon/>
-                            </IconButton>
-                        </Box>
-                    </BoxContainer>
-                    <BoxContainer label="Genres" quantily={film?.genres.length}>
-                        <ListContainer>
-                            {film?.genres.map((value, key) => (
-                                <CardItem
-                                    key={key}
-                                    name={value.genre.name}
-                                    action
-                                    quanlity={value.genre.films.length}
-                                    onClick={() => deleteGenre(value.id)}
-                                />
-                            ))}
-                        </ListContainer>
-                    </BoxContainer>
-                    <BoxContainer label="Persons" quantily={film?.persons.length}>
-                        <ListContainer>
-                            {film?.persons.map((value, key) => (
-                                <CardItem
-                                    key={key}
-                                    name={value.person.name}
-                                    action
-                                    quanlity={value.person.films.length}
-                                    onClick={() => deletePerson(value.id)}
-                                    onClickDetail={() => navigate(`../persons/${value.person.id}`, {replace: true})}
-                                    avatar={value.person.avatar}
-                                />
-                            ))}
-                        </ListContainer>
-                    </BoxContainer>
+                <Box className="flex-wrap">
+                    <Box height={400} width={400}>
+                        <DataGrid columns={columnsPersons} rows={film?.persons === undefined ? [] : film?.persons}
+                        />
+                    </Box>
+                    <Box height={400} width={400}>
+                        <DataGrid columns={columnsGenres} rows={film?.genres === undefined ? [] : film?.genres}
+                        />
+                    </Box>
+
                 </Box>
+                <ButtonOutlined
+                    onClick={() => navigate(`../films/edit/${filmId}`)}
+                >
+                    <EditIcon/>
+                </ButtonOutlined>
+                <ButtonOutlined
+                    onClick={() => setOpenDialog(true)}
+                    title={"delete"} color={'error'}
+                >
+                    <DeleteIcon/>
+                </ButtonOutlined>
             </Box>
             <ConfirmDialog
                 open={openDialog}
@@ -353,9 +372,7 @@ export const DetailFilm = () => {
                     }
                 }}
             />
-            <Button onClick={() => setOpenDialog(true)} title={"delete"} color={'error'} fullWidth variant={'outlined'}>
-                <DeleteIcon/>
-            </Button>
+
         </Box>
     );
 };

@@ -1,10 +1,10 @@
 import {
-    Avatar, Backdrop,
-    Box, CircularProgress,
+    Avatar,
+    Backdrop,
+    Box,
+    CircularProgress,
     FormControl,
     FormControlLabel,
-    IconButton,
-    LinearProgress,
     MenuItem,
     RadioGroup,
     TextField,
@@ -17,18 +17,14 @@ import React, {useEffect, useState} from "react";
 import {v4} from "uuid";
 import CustomButton from "../components/Button/CustomButton";
 import CustomInput from "../components/Input/CustomInput";
-import {CustomMenu} from "../components/Menu/CustomMenu";
 import {REQUEST_TYPE} from "../Enums/RequestType";
 import {storage} from "../firebase/firebase";
 import {useApi} from "../hooks/useApi";
-import {FilmEntity} from "../models/FilmEnity";
 import {GenreEntity} from "../models/GenreEntity";
 import {PersonEntity} from "../models/PersonEntity";
 import {ProducerEntity} from "../models/ProducerEntity";
 import Radio from "@mui/material/Radio";
-import AddIcon from "@mui/icons-material/Add";
 import {useNavigate} from "react-router-dom";
-import People from "@mui/icons-material/People";
 
 const UploadPage = () => {
     const {enqueueSnackbar} = useSnackbar();
@@ -46,7 +42,7 @@ const UploadPage = () => {
     const [length, setLength] = useState(0);
     const [producer, setProducer] = useState("");
     const [isUploading, setIsUploading] = useState(false);
-    const [premium, setPremium] = useState(false);
+    const [premium, setPremium] = useState(true);
     const navigate = useNavigate();
 
     const handleSelectProducer = (event: any) => {
@@ -133,7 +129,7 @@ const UploadPage = () => {
             })
             .catch((err) => {
                 setIsUploading(false);
-                enqueueSnackbar("Upload Video Faild!", {variant: "error"});
+                enqueueSnackbar("Upload Video Failed!", {variant: "error"});
                 console.error(err);
                 return;
             });
@@ -150,7 +146,7 @@ const UploadPage = () => {
             })
             .catch((err) => {
                 setIsUploading(false);
-                enqueueSnackbar("Upload Mobile Image Faild!", {variant: "error"});
+                enqueueSnackbar("Upload Mobile Image Failed!", {variant: "error"});
                 console.error(err);
                 return;
             });
@@ -176,12 +172,11 @@ const UploadPage = () => {
     };
 
     const columnsPersons: GridColDef[] = [
-        {field: "name", headerName: "Name Person", width: 250},
-        {field: "avatar", headerName: "Avatar", width: 250, renderCell: params => <Avatar src={params.value}/>},
+        {field: "name", renderHeader: () => <Typography className={"style-header-grid"}>Person Name</Typography>, width: 200},
+        {field: "avatar", headerName: "Avatar", width: 100, renderCell: params => <Avatar src={params.value}/>},
     ];
     const columGenres: GridColDef[] = [
-        {field: "name", headerName: "Name Persons", width: 120},
-        {field: "created", headerName: "Created", width: 250},
+        {field: "name", renderHeader: () => <Typography>Genre Name</Typography>, width: 200},
     ];
 
     const listAge = [
@@ -197,6 +192,7 @@ const UploadPage = () => {
     ];
 
     const {callApi} = useApi();
+    console.log(premium)
 
     const createFilm = () => {
         //#region Check Valid
@@ -212,16 +208,16 @@ const UploadPage = () => {
         });
 
         if (name === "")
-            return enqueueSnackbar("Chưa ghi tên mà đăng cái gì?", {
+            return enqueueSnackbar("Chưa ghi tên?", {
                 variant: "warning",
             });
         if (producer === "")
-            return enqueueSnackbar("Chưa chọn nhà sản xuất mà đăng cái gì?", {
+            return enqueueSnackbar("Chưa chọn nhà sản xuất?", {
                 variant: "warning",
             });
         if (age === "") return enqueueSnackbar("Tuổi đâu?", {variant: "warning"});
         if (describe === "")
-            return enqueueSnackbar("Chưa ghi mô tả mà đăng cái gì?", {
+            return enqueueSnackbar("Chưa ghi mô tả gì?", {
                 variant: "warning",
             });
         if (length === 0)
@@ -235,15 +231,15 @@ const UploadPage = () => {
                 variant: "warning",
             });
         if (webUrl === "")
-            return enqueueSnackbar("Chưa đăng ảnh nền website kìa má?", {
+            return enqueueSnackbar("Chưa có poster website?", {
                 variant: "warning",
             });
         if (videoUrl === "")
-            return enqueueSnackbar("Chưa đăng ảnh nền website kìa má?", {
+            return enqueueSnackbar("Chưa có video?", {
                 variant: "warning",
             });
-        if (webUrl === "")
-            return enqueueSnackbar("Chưa đăng ảnh nền website kìa má?", {
+        if (mobileUrl === "")
+            return enqueueSnackbar("Chưa có ảnh nền?", {
                 variant: "warning",
             });
         //#endregion
@@ -266,16 +262,21 @@ const UploadPage = () => {
                 navigate("/films");
             })
             .catch((err) => {
-                enqueueSnackbar("Add Film Faild", {variant: "error"});
+                enqueueSnackbar("Add Film Failed", {variant: "error"});
                 console.error(err);
             });
     };
 
+   
+
     useEffect(() => {
-        getPersons();
-        getGenres();
-        getProducers();
-    }, [getGenres, getPersons, getProducers]);
+        return () => {
+            getPersons();
+            getGenres();
+            getProducers();
+        };
+    }, []);
+    
 
     const clean = () => {
         setName("");
@@ -290,7 +291,7 @@ const UploadPage = () => {
         setWebImgUpload(null);
     };
 
-    const renderUploadFilm = (
+    return (
         <Box
             sx={{
                 height: "100%",
@@ -299,7 +300,7 @@ const UploadPage = () => {
                 borderRadius: 5,
             }}
         >
-            <Typography>UPLOAD FILM</Typography>
+            <Typography fontWeight={'bold'} fontSize={25}>UPLOAD FILM</Typography>
             <div className="dp-flex">
                 <CustomInput
                     placeholder="Name"
@@ -340,8 +341,8 @@ const UploadPage = () => {
             </div>
             <div className="dp-flex">
                 <CustomInput
-                    placeholder="Desribe"
-                    label={`Desribe ${describe.length > 0 ? describe.length : ""}`}
+                    placeholder="Describe"
+                    label={`Describe ${describe.length > 0 ? describe.length : ""}`}
                     value={describe}
                     onChange={onChangeDescribe}
                 />
@@ -349,7 +350,7 @@ const UploadPage = () => {
                     margin="normal"
                     fullWidth
                     id="outlined-number"
-                    label="Lenght (minutes)"
+                    label="Length (minutes)"
                     type="number"
                     onChange={onChangeLength}
                     InputLabelProps={{
@@ -386,7 +387,7 @@ const UploadPage = () => {
             <FormControl>
                 <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue="female"
+                    defaultValue="premium"
                     name="radio-buttons-group"
                 >
                     <Box>
@@ -473,7 +474,6 @@ const UploadPage = () => {
             </div>
         </Box>
     );
-    return renderUploadFilm;
 };
 
 export default UploadPage;

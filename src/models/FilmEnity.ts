@@ -9,6 +9,7 @@ export interface FilmEntity {
     describe: string,
     producerId: string,
     premium: boolean,
+    length: number,
     producer: ProducerEntity,
     ratings: RatingEntity[],
     mobileUrl: string,

@@ -40,22 +40,20 @@ const CardUser = ({
             }}
         >
             {premium ? <WorkspacePremiumIcon color="warning" fontSize="large"/> : ""}
-            {avatar ?
-                <Avatar
-                    sx={{
-                        textAlign: "end",
-                        width: 200,
-                        m: 2,
-                        height: 200,
-                        ":hover": {
-                            boxShadow: 4,
-                            cursor: 'pointer'
-                        },
-                    }}
-                    src={avatar !== "" ? avatar : ""}
-                    onClick={onChoose}
-                /> : null
-            }
+            <Avatar
+                sx={{
+                    textAlign: "end",
+                    width: 200,
+                    m: 2,
+                    height: 200,
+                    ":hover": {
+                        boxShadow: 4,
+                        cursor: 'pointer'
+                    },
+                }}
+                src={avatar !== "" ? avatar : "https://st3.depositphotos.com/1767687/16607/v/450/depositphotos_166074422-stock-illustration-default-avatar-profile-icon-grey.jpg"}
+                onClick={onChoose}
+            />
             <Box
                 sx={{
                     ml: 4,

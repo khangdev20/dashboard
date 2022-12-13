@@ -36,11 +36,13 @@ const DetailGenre = () => {
             <Typography fontSize={30} fontWeight={'bold'}>
                 {genre?.name}
             </Typography>
-            {
-                genre?.films.map((value, key) => (
-                    <CardFilm src={value.film.mobileUrl} />
-                ))
-            }
+            <Box className={'flex-wrap'}>
+                {
+                    genre?.films.map((value, key) => (
+                        <CardFilm src={value.film.mobileUrl}/>
+                    ))
+                }
+            </Box>
         </Box>
     )
 }

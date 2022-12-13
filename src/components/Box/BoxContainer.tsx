@@ -8,9 +8,8 @@ const BoxContainer = ({quantity, label, children}: any) => {
                 sx={{
                     backgroundColor: "white",
                     borderRadius: 3,
-                    flex: 1,
                     boxShadow: 5,
-                    m: 2,
+                    m: 5,
                     background: '#4444',
                 }}
             >
@@ -18,9 +17,7 @@ const BoxContainer = ({quantity, label, children}: any) => {
                     sx={{
                         alignItems: "center",
                         display: "flex",
-                        background: '#6666',
                         borderRadius: 3,
-                        boxShadow: 5,
                         p: 1,
                         pl: 2,
                     }}

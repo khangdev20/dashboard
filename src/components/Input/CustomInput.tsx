@@ -46,11 +46,9 @@ export default function CustomInput({
                                 }}
                                 onClick={() => setTypeText(!typeText)}
                             >
-                                {typeText ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+                                {typeText ? <VisibilityOffIcon color={'error'}/> : <VisibilityIcon color={'error'}/>}
                             </div>
-                        ) : (
-                            ""
-                        )}
+                        ) : null}
                     </InputAdornment>
                 ),
             }}

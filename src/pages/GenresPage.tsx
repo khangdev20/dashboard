@@ -1,6 +1,6 @@
 import React, {useState, useCallback, useEffect} from "react";
 import {styles as modalTheme} from "../../src/containts";
-import {Box, Modal, Typography, LinearProgress, TextField} from "@mui/material";
+import {Box, Modal, Typography, LinearProgress, TextField, Avatar} from "@mui/material";
 import CustomButton from "../components/Button/CustomButton";
 import {GenreEntity} from "../models/GenreEntity";
 import {useApi} from "../hooks/useApi";
@@ -148,6 +148,11 @@ export default function GenresPage() {
 
     const columnFilms: GridColDef[] = [
         {
+            field: 'webUrl',
+            renderHeader: () => <Typography className="style-header-grid">Poster</Typography>,
+            renderCell: params => <img alt={''} width={100} src={params.value}/>
+        },
+        {
             field: "name",
             renderHeader: () => <Typography className="style-header-grid">Film Name</Typography>,
             width: 250
@@ -158,7 +163,6 @@ export default function GenresPage() {
         <Box>
             {loading ? <LinearProgress color="secondary"/> : ""}
             <Box sx={{
-                width: '100%',
                 height: 500,
                 ":hover": {
                     cursor: 'pointer'
@@ -199,7 +203,7 @@ export default function GenresPage() {
             <Modal open={openModalAddGenreToFilm} onClose={handleCloseGenreToFilm}>
                 <Box sx={modalTheme}>
                     <Typography margin={1} fontWeight={'bold'}>ADD GENRE TO FILM</Typography>
-                    <Box width={340}>
+                    <Box width={500}>
                         <DataGrid
                             checkboxSelection
                             rowsPerPageOptions={[5]}

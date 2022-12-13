@@ -7,4 +7,5 @@ export interface PersonEntity {
   films: PersonFilmEntity[];
   describe: string
   avatar: string
+  created: Date
 }

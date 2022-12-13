@@ -84,7 +84,7 @@ const PackagePage = () => {
                 setOpenConfirm(false);
             })
             .catch((err) => {
-                enqueueSnackbar("DELETE PACKAGE FAILD", {variant: "error"});
+                enqueueSnackbar("DELETE PACKAGE FAILED", {variant: "error"});
                 setPack(undefined);
                 console.error(err);
             });
@@ -165,7 +165,14 @@ const PackagePage = () => {
 
     return (
         <Box>
-            <Box height={400}>
+            <Box
+                sx={{
+                    height: 500,
+                    ":hover": {
+                        cursor: 'pointer'
+                    }
+                }}
+            >
                 <DataGrid
                     columns={columns}
                     rows={packages}

@@ -20,11 +20,14 @@ import {useApi} from "../hooks/useApi";
 import {REQUEST_TYPE} from "../Enums/RequestType";
 import {UserEntity} from "../models/UserEntity";
 import {useNavigate} from "react-router-dom";
-import {DataGrid, GridColDef, GridRowId} from "@mui/x-data-grid";
+import {DataGrid, GridCellParams, GridColDef, GridRowId} from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ButtonOutlined from "../components/Button/ButtonOutlined";
-import {AddCircle} from "@mui/icons-material";
+import {AddCircle, DoneAll, RemoveDone} from "@mui/icons-material";
+import CheckIcon from "@mui/icons-material/Check";
+import {ConfirmDialog} from "../components/Dialog/ConfirmDialog";
+import {deleteObjectFirebase} from "../firebase/deleteObject";
 
 export default function UsersPage() {
     const {enqueueSnackbar} = useSnackbar();
@@ -37,11 +40,13 @@ export default function UsersPage() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
+    const [user, setUser] = useState<UserEntity>();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [users, setUsers] = useState<UserEntity[]>([]);
     const [userSelects, setUserSelects] = useState<GridRowId[]>([]);
     const [sex, setSex] = useState(true);
+    const [openConfirm, setOpenConfirm] = useState(false);
     const navigate = useNavigate();
 
     //#region onChange
@@ -50,6 +55,12 @@ export default function UsersPage() {
     ) => {
         setRole(event.target.value);
     };
+
+    const handleOpenConfirm = () => {
+        getUserId(userSelects[0]);
+        if (userSelects.length === 0) return enqueueSnackbar("Please select a user!", {variant: 'warning'})
+        setOpenConfirm(true)
+    }
 
     const onChangeName = (e: any) => {
         setName(e.target.value);
@@ -106,10 +117,8 @@ export default function UsersPage() {
             phone: phone,
             password: password,
             confirmPassword: confirmPassword,
-            passwordOld: "",
-            sex: sex,
             avatar: "",
-            current: "",
+            sex: sex,
             role: role,
         })
             .then(() => {
@@ -126,6 +135,18 @@ export default function UsersPage() {
             });
     };
 
+    const deleteUser = (id: any) => {
+        callApi(REQUEST_TYPE.DELETE, `api/users/${id}`)
+            .then(() => {
+                enqueueSnackbar("Delete user success!", {variant: 'success'})
+                getUsers();
+                setOpenConfirm(false);
+            })
+            .catch(() => {
+                enqueueSnackbar("Delete use is failed", {variant: 'error'});
+            })
+    }
+
     const getUsers = useCallback(() => {
         callApi<UserEntity[]>(REQUEST_TYPE.GET, "api/users")
             .then((res) => {
@@ -135,6 +156,28 @@ export default function UsersPage() {
             console.error(err)
         })
     }, [callApi]);
+
+    const getUserId = (id: any) => {
+        callApi<UserEntity>(REQUEST_TYPE.GET, `api/users/${id}`)
+            .then((res) => {
+                setLoading(true)
+                setUser(res.data)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
+    const handleDeleteUser = () => {
+        if (user?.avatar === '')
+        {
+            deleteUser(userSelects[0]);
+        }
+        else {
+            deleteObjectFirebase(user?.avatar!);
+            deleteUser(userSelects[0]);
+        }
+    }
 
     useEffect(() => {
         return () => {
@@ -155,29 +198,37 @@ export default function UsersPage() {
             field: "avatar",
             renderHeader: () => <Typography className={"style-header-grid"}>Avatar</Typography>,
             width: 100,
-            renderCell: params => <Avatar src={params.value}/>
+            renderCell: params => <Avatar src={params.value}/>,
+            align: 'center',
+            headerAlign: 'center'
         },
         {
             field: "name",
             renderHeader: () => <Typography className={"style-header-grid"}>Name</Typography>,
-            width: 200
+            width: 200,
+            headerAlign: 'center'
         },
         {
             field: "email",
             renderHeader: () => <Typography className={"style-header-grid"}>Email</Typography>,
+            headerAlign: 'center',
             width: 200
         },
         {
             field: "sex",
             renderHeader: () => <Typography className={"style-header-grid"}>Sex</Typography>,
             width: 100,
+            headerAlign: 'center',
+            align: 'center',
             renderCell: params => params.value ? "Male" : "Female"
         },
         {
             field: "premium",
             renderHeader: () => <Typography className={"style-header-grid"}>Premium</Typography>,
             width: 100,
-            renderCell: params => params.value ? "Premium" : "None"
+            headerAlign: 'center',
+            align: 'center',
+            renderCell: params => params.value ? <DoneAll color={'success'}/> : <RemoveDone color={'error'}/>
         },
         {
             field: "dateUse",
@@ -196,7 +247,8 @@ export default function UsersPage() {
             <Box sx={{
                 ":hover": {
                     cursor: 'pointer'
-                }
+                },
+                height: 500
             }}>
                 <DataGrid
                     rows={users}
@@ -207,10 +259,16 @@ export default function UsersPage() {
                     checkboxSelection
                     onSelectionModelChange={(itm) => {
                         setUserSelects(itm)
+                        console.log(itm)
                     }}
-                    autoHeight={true}
                 />
             </Box>
+            <ConfirmDialog
+                open={openConfirm}
+                handleCancel={() => setOpenConfirm(false)}
+                handleOk={() => handleDeleteUser()}
+                title={"Do you really want to delete it?"}
+            />
             <Box margin={1}>
                 <ButtonOutlined color={'success'} onClick={moveToEditPage}>
                     <EditIcon fontSize={'small'}/>
@@ -218,7 +276,7 @@ export default function UsersPage() {
                 <ButtonOutlined onClick={() => setOpenModal(true)}>
                     <AddCircle fontSize={'small'}/>
                 </ButtonOutlined>
-                <ButtonOutlined color={'error'}>
+                <ButtonOutlined color={'error'} onClick={handleOpenConfirm}>
                     <DeleteIcon fontSize={'small'}/>
                 </ButtonOutlined>
             </Box>

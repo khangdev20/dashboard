@@ -123,7 +123,6 @@ export default function ProducersPage() {
         <Box>
             <Box sx={{
                 width: '100%',
-                height: 500,
                 ":hover": {
                     cursor: 'pointer'
                 }
@@ -136,6 +135,7 @@ export default function ProducersPage() {
                     onCellDoubleClick={(itm) => {
                         navigate(`${itm.id}`)
                     }}
+                    autoHeight={true}
                     checkboxSelection
                     onSelectionModelChange={(item) => {
                         setProducerSelects(item);
@@ -156,19 +156,21 @@ export default function ProducersPage() {
             <Modal open={openModal} onClose={handleCloseModal}>
                 <form onSubmit={(e) => e.preventDefault()}>
                     <Box sx={modalTheme}>
-                        <Typography fontWeight={'bold'}>ADD PRODUCER</Typography>
-                        <CustomInput
-                            placeholder="Producer Name"
-                            label="Producer Name "
-                            value={name}
-                            onChange={onChangeName}
-                        />
-                        <CustomButton color="error" text="SUBMIT" onClick={createProducer} type={'submit'}/>
-                        <CustomButton
-                            color="inherit"
-                            text="CLOSE"
-                            onClick={handleCloseModal}
-                        />
+                        <Box width={400} display={'flex'} flexDirection={"column"} alignItems={'center'}>
+                            <Typography fontWeight={'bold'}>ADD PRODUCER</Typography>
+                            <CustomInput
+                                placeholder="Producer Name"
+                                label="Producer Name "
+                                value={name}
+                                onChange={onChangeName}
+                            />
+                            <CustomButton color="error" text="SUBMIT" onClick={createProducer} type={'submit'}/>
+                            <CustomButton
+                                color="inherit"
+                                text="CLOSE"
+                                onClick={handleCloseModal}
+                            />
+                        </Box>
                     </Box>
                 </form>
             </Modal>

@@ -8,11 +8,11 @@ const ListContainer = ({children}: any) => {
                 p: 1,
                 ml: 0.5,
                 mr: 0.5,
-                maxHeight: 300,
                 minHeight: 300,
-                minWidth: 440,
-                maxWidth: 440,
-                overflowY: "scroll",
+                maxHeight: 300,
+                minWidth: 450,
+                maxWidth: 400,
+                overflowY: "auto",
             }}
         >
             {children}

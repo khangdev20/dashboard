@@ -16,7 +16,7 @@ export default function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [correct, setCorrect] = useState(false);
 
-    const onChanegName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
     };
     const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,13 +60,12 @@ export default function Register() {
                         alt="LOGO"
                         src="https://cdn.discordapp.com/attachments/1019968445418319914/1033082905985028226/codeflix-logo.png"
                     />
-
                     <CustomInput
                         label="Name"
                         placeholder="Name"
                         type="text"
                         value={name}
-                        onChange={onChanegName}
+                        onChange={onChangeName}
                     />
                     <CustomInput
                         label="Email"

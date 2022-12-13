@@ -42,8 +42,8 @@ const DetailUser = () => {
     };
     const getUserId = useCallback(
         () => {
-            console.log('reload laij')
-            callApi<UserEntity>(REQUEST_TYPE.GET, `api/users/u?id=${userId}`)
+            console.log('reload')
+            callApi<UserEntity>(REQUEST_TYPE.GET, `api/users/${userId}`)
                 .then((res) => {
                     const response = res.data;
                     setUser(response);
@@ -93,10 +93,34 @@ const DetailUser = () => {
     }, [getUserId]);
 
     const columns: GridColDef[] = [
-        {field: 'packageName', renderHeader: () => <Typography className={"style-header-grid"}>Package</Typography>, width: 200},
+        {
+            field: 'packageName',
+            renderHeader: () => <Typography className={"style-header-grid"}>Package</Typography>,
+            width: 200
+        },
         {field: 'time', renderHeader: () => <Typography className={"style-header-grid"}>Time</Typography>, width: 200},
-        {field: 'price', renderHeader: () => <Typography className={"style-header-grid"}>Price</Typography>, width: 200},
-        {field: 'created', renderHeader: () => <Typography className={"style-header-grid"}>Created</Typography>, width: 200},
+        {
+            field: 'price',
+            renderHeader: () => <Typography className={"style-header-grid"}>Price</Typography>,
+            width: 200
+        },
+        {
+            field: 'created',
+            renderHeader: () => <Typography className={"style-header-grid"}>Created</Typography>,
+            width: 200
+        },
+    ]
+    const columnsAddFunds: GridColDef[] = [
+        {
+            field: 'money',
+            renderHeader: () => <Typography className={"style-header-grid"}>Money</Typography>,
+            width: 200
+        },
+        {
+            field: 'created',
+            renderHeader: () => <Typography className={"style-header-grid"}>Created</Typography>,
+            width: 200
+        },
     ]
 
     return (
@@ -154,7 +178,13 @@ const DetailUser = () => {
             <Box className="just-center">
                 <Typography fontWeight={'bold'}>TRANSACTION</Typography>
                 <Box height={300}>
-                    <DataGrid columns={columns} rows={user?.wallet.transactions === undefined ? [] : user.wallet.transactions }/>
+                    <DataGrid columns={columns}
+                              rows={user?.wallet.transactions === undefined ? [] : user.wallet.transactions}/>
+                </Box>
+                <Typography fontWeight={'bold'}>ADD FUND</Typography>
+                <Box height={300}>
+                    <DataGrid columns={columnsAddFunds}
+                              rows={user?.wallet.addFunds === undefined ? [] : user.wallet.addFunds}/>
                 </Box>
                 <Typography fontWeight={'bold'}>PLAY LIST</Typography>
                 <Box sx={{backgroundColor: 'rgba(229,172,172,0.31)', borderRadius: 5}}>
@@ -162,8 +192,10 @@ const DetailUser = () => {
                         <Typography padding={2} margin={1}>User don't have Play list</Typography> :
                         <Box display={'flex'} overflow={'auto'}>
                             {user?.playLists.map((value, key) => (
-                                <CardFilm key={key} src={value.film.mobileUrl}
-                                          onClick={() => navigate(`/films/${value.filmId}`)}/>
+                                <CardFilm
+                                    key={key}
+                                    src={value.film.mobileUrl}
+                                    onClick={() => navigate(`/films/${value.filmId}`)}/>
                             ))}
                         </Box>
                     }
@@ -175,8 +207,10 @@ const DetailUser = () => {
                         <Box overflow={'auto'}>
                             <Box display={'flex'}>
                                 {user?.histories.map((value, key) => (
-                                    <CardFilm key={key} src={value.film.mobileUrl}
-                                              onClick={() => navigate(`/films/${value.filmId}`)}/>
+                                    <CardFilm
+                                        key={key}
+                                        src={value.film.mobileUrl}
+                                        onClick={() => navigate(`/films/${value.filmId}`)}/>
                                 ))}
                             </Box>
                         </Box>

@@ -1,4 +1,5 @@
 import {TransactionEntity} from "./TransactionEntity";
+import {AddFundEntity} from "./AddFundEntity";
 
 export interface SalesEntity {
     id: string,
@@ -6,5 +7,6 @@ export interface SalesEntity {
     dateStart: Date,
     dateEnd: Date,
     created: Date,
-    transactions: TransactionEntity[]
+    transactions: TransactionEntity[],
+    addFunds: AddFundEntity[],
 }

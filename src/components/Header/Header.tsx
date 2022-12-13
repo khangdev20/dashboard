@@ -44,6 +44,7 @@ function Header() {
         window.location.reload();
     };
     const getProfile = useCallback(() => {
+        console.log("get profile")
         callApi<UserEntity>(REQUEST_TYPE.GET, "api/users/profile")
             .then((res) => {
                 if (res.data.role !== "Administrator") {
@@ -60,8 +61,11 @@ function Header() {
     }, [callApi]);
 
     useEffect(() => {
-        getProfile();
+        return () => {
+            getProfile();
+        };
     }, [getProfile]);
+
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);

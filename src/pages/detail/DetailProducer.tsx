@@ -1,25 +1,24 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useApi} from "../../hooks/useApi";
 import {REQUEST_TYPE} from "../../Enums/RequestType";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {ProducerEntity} from "../../models/ProducerEntity";
-import {Box} from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import {CardFilm} from "../../components/Card/CardFilm";
-import CardUser from "../../components/Card/CardUser";
 
 const DetailProducer = () => {
 
     const [producer, setProducer] = useState<ProducerEntity>();
-
     const {producerId} = useParams();
+    const navigate = useNavigate();
     const {callApi} = useApi();
-    const getProducer = () => {
+    const getProducer = useCallback(() => {
         callApi<ProducerEntity>(REQUEST_TYPE.GET, `api/producers/${producerId}`).then((res) => {
             setProducer(res.data)
         }).catch((err) => {
             console.error(err)
         })
-    }
+    }, [callApi, producerId])
 
     useEffect(() => {
         return () => {
@@ -30,10 +29,16 @@ const DetailProducer = () => {
 
     return (
         <Box>
-            <CardUser name={producer?.name}/>
+            <Typography padding={2} fontSize={40} fontWeight={'bold'}>
+                {producer?.name}
+            </Typography>
             <Box display={'flex'} overflow={"auto"}>
                 {producer?.films.map((value, index, array) => (
-                    <CardFilm src={value.mobileUrl}/>
+                    <CardFilm
+                        src={value.mobileUrl}
+                        onClick={() => navigate(`../films/${value.id}`)}
+
+                    />
                 ))}
             </Box>
         </Box>);

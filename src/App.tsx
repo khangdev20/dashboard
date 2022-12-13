@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { Fragment, useEffect } from "react";
 import Login from "./pages/auth/Login/Login";
 import "./App.css";
-import { publicRoutes } from "./routes/index";
+import { publicRoutes } from "./routes";
 import DefaultLayout from "./components/Layout/DefaultLayout/DefaultLayout";
 import { SnackbarProvider } from "notistack";
 import { Box } from "@mui/material";
@@ -12,6 +12,7 @@ import { REQUEST_TYPE } from "./Enums/RequestType";
 function App() {
   const { callApi } = useApi();
   const getNewToken = () => {
+      console.log("getNewToken")
     callApi<string>(REQUEST_TYPE.GET, "api/users/getNewToken")
       .then((res) => {
         const response = res.data;
@@ -23,9 +24,13 @@ function App() {
       });
   };
 
-  useEffect(() => {
-    setInterval(getNewToken, 1800000);
-  }, []);
+    useEffect(() => {
+        return () => {
+            getNewToken();
+            setInterval(getNewToken, 1800000);
+            console.log('reload useEffect')
+        };
+    }, [getNewToken]);
 
   return (
     <SnackbarProvider autoHideDuration={2000} maxSnack={6}>
